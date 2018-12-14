@@ -1,6 +1,6 @@
 require_relative('chess_objects')
+require_relative('user_interface')
 
-bobo
-# x = Testy.new('leo')
+include Ui_messages
 
-# p x
+ welcome_message
