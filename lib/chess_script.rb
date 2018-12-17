@@ -6,9 +6,9 @@ include Ui_messages
 
 # welcome_message
 
-testing_board = Chess_board.new
-test_pawn = Pawn.new
+testing_game = Chess_board.new
+testing_game.print_board
+ puts ' - - - -'
 
-
-testing_board.board[0][0] = test_pawn.name + '-' + test_pawn.color
-p testing_board.board[0] 
+testing_game.populate_board
+testing_game.print_board
