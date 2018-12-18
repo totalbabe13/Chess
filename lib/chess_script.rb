@@ -6,21 +6,31 @@ include Ui_messages
 
  welcome_message
  user_response_1 = gets.chomp
+
  if user_response_1
  	load_or_new
  	
  	user_response_2 = gets.chomp
- 	 if user_response_2 == '1'
- 	 	puts "test - Start new game path"
- 	 elsif user_response_2 == '2'
- 	 	puts "test - Load old game path"
- 	 else 
- 	    puts " INVALID ENTRY"	
- 	 end	
+ 	if user_response_2 == '1'
+ 	   new_game_player1
+ 	     player_one = gets.chomp
+ 	   new_game_player2
+ 	     player_two = gets.chomp
+ 	
+       new_game = Chess_game.new(player_one,player_two)
+       new_game.print_board
+       
+       # new_game.player_input_coordinates(5,'d')
+
+
+
+ 	elsif user_response_2 == '2'
+ 	 puts "test - Load old game path"
+ 	else 
+ 	 puts " INVALID ENTRY"	
+ 	end	
  	 			
  end	
 
-# testing_game = Chess_board.new
-# testing_game.print_board
 
 	

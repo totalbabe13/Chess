@@ -38,7 +38,27 @@ module Ui_messages
   	puts "                                        THEN PRESS -->  RETURN KEY "
     15.times { |i| puts " " }
     # user_response = gets.chomp
+  end
+
+  def new_game_player1
+    system("clear")
+    15.times { |i| puts " " }
+    puts "                                        ♟  white - PLAYER ONE Enter Your name:"
+    #puts "                                        "
+    puts "                                        THEN PRESS -->  RETURN KEY "
+    15.times { |i| puts " " }
   end 
+
+  def new_game_player2
+    system("clear")
+    15.times { |i| puts " " }
+    puts "                                        ♙ black - PLAYER TWO Enter Your name:"
+    #puts "                                        "
+    puts "                                        THEN PRESS -->  RETURN KEY "
+    15.times { |i| puts " " }
+  end
+
+  
 
 
 end
