@@ -33,10 +33,11 @@ module Ui_messages
   def load_or_new
   	system("clear")
   	15.times { |i| puts " " }
-  	puts "                                        ♜  Press 1: to START a NEW GAME"
-  	puts "                                        ♖  Press 2: to LOAD a SAVED GAME"
-  	15.times { |i| puts " " }
-    user_response = gets.chomp
+  	puts "                                        ♜  Enter 1: to START a NEW GAME"
+  	puts "                                        ♖  Enter 2: to LOAD a SAVED GAME"
+  	puts "                                        THEN PRESS -->  RETURN KEY "
+    15.times { |i| puts " " }
+    # user_response = gets.chomp
   end 
 
 
