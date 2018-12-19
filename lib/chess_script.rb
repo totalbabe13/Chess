@@ -19,6 +19,7 @@ include Ui_messages
  	
        new_game = Chess_game.new(player_one,player_two)
        new_game.print_board
+       new_game.print_board
        
        # new_game.player_input_coordinates(5,'d')
 

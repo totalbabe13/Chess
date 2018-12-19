@@ -48,6 +48,7 @@ class Chess_game
 	end	
 
   def ask_player_to_select_piece
+    puts " S E L E C T    T H E    P I E C E   Y O U   W A N T   T O   M O V E"
     puts "TYPE  the ROW (1-8) of the piece you want to move: and press ENTER"
     row = gets.chomp
     puts 'TYPE in the COLUMN (a - h / A - H) of the piece you want to move:  and press ENTER'
@@ -57,7 +58,7 @@ class Chess_game
     puts '' 
     piece = find_player_input_coordinates(row,column)
     puts "You want to move your #{piece} that is located at row: #{row} and column: #{column} "
-    move_from = [piece,from]
+    move_from = from
     # return move_from
   end 
 
@@ -66,19 +67,47 @@ class Chess_game
     row = gets.chomp
     puts 'TYPE in the COLUMN (a - h / A - H) you want to move to: and press ENTER'
     column = gets.chomp
+    move_towards = [row,column] 
     puts "- - - - -" 
     puts '' 
     move_to = find_player_input_coordinates(row,column)
     puts "You want to move your piece to row: #{row} and column: #{column}: that is #{move_to} "
-    # return move_to
+    move_towards
   end 
 
   def move_piece(start,finish)
-    x = start
-    y = finish
+    from    = convert_user_input(start)
+    towards = convert_user_input(finish)
+    piece   = board[from[0]][from[1]]
+
+    board[from[0]][from[1]] = '-'
+    board[towards[0]][towards[1]] = piece
+  end 
+
+  def convert_user_input(location)
+    x = (location[0].to_i) - 1
+    y = location[1]
     
-    p "this is x --> #{x}" 
-    
+    case y
+      when 'a' || 'A'
+       y = 0
+      when 'b' || 'B'
+       y = 1
+      when 'c' || 'C'
+       y = 2 
+      when 'd' || 'D'
+       y = 3
+      when 'e' || 'E'
+       y = 4 
+      when 'f' || 'F'
+       y = 5
+      when 'g' || 'G'
+       y = 6 
+      when 'h' || 'H'
+       y = 7 
+    end 
+    located = [x,y]
+    located
   end  
 
   def find_player_input_coordinates(x,y)
@@ -113,10 +142,10 @@ class Chess_game
     if board[x][y] != '-'
       p board[x][y]
     else 
-      p 'Available spot'
+      p 'EMPTY CELL'
     end
-    start = board[x][y] 
-    return start  
+    piece = board[x][y] 
+      
   end
 
 end #end of chess	
