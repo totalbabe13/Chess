@@ -41,8 +41,10 @@ class Chess_game
     puts ''
     puts "PLAYER ONE: #{player_one[0]}"
     2.times { |i| puts " " } 
-    ask_player_to_select_piece
-    ask_player_to_choose_destination
+    move_piece(ask_player_to_select_piece,ask_player_to_choose_destination)
+
+    # ask_player_to_select_piece
+    # ask_player_to_choose_destination
 	end	
 
   def ask_player_to_select_piece
@@ -50,10 +52,13 @@ class Chess_game
     row = gets.chomp
     puts 'TYPE in the COLUMN (a - h / A - H) of the piece you want to move:  and press ENTER'
     column = gets.chomp
+    from = [row,column]
     puts "- - - - -" 
     puts '' 
     piece = find_player_input_coordinates(row,column)
     puts "You want to move your #{piece} that is located at row: #{row} and column: #{column} "
+    move_from = [piece,from]
+    # return move_from
   end 
 
   def ask_player_to_choose_destination
@@ -63,12 +68,17 @@ class Chess_game
     column = gets.chomp
     puts "- - - - -" 
     puts '' 
-    new_spot = find_player_input_coordinates(row,column)
-    puts "You want to move your piece to row: #{row} and column: #{column}: that is #{new_spot} "
+    move_to = find_player_input_coordinates(row,column)
+    puts "You want to move your piece to row: #{row} and column: #{column}: that is #{move_to} "
+    # return move_to
   end 
 
-  def move_piece(r,c)
-   
+  def move_piece(start,finish)
+    x = start
+    y = finish
+    
+    p "this is x --> #{x}" 
+    
   end  
 
   def find_player_input_coordinates(x,y)
@@ -109,9 +119,4 @@ class Chess_game
     return start  
   end
 
-end	
-
-# class PLayer
-#   def initialize
-# end  
-
+end #end of chess	
