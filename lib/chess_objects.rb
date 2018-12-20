@@ -114,8 +114,8 @@ class Chess_game
     towards = convert_user_input(finish)
     piece   = board[from[0]][from[1]]
     
-    puts '---- testing possible moves 1 ----'
-    puts "from is #{from}"
+    puts '---- testing possible moves 1 (inside #move_piece) ----'
+    puts "from is  row-> #{from[0]} and column-> #{from[1]} }"
     puts "towards is #{towards}"
     check_possible_move_for(piece,from)
 
@@ -209,12 +209,25 @@ class Chess_game
   end 
 
   def check_possible_move_for(piece,location)
-    puts '---- testing possible moves 2 ----'
-    # piece =>  ♖
-    # location  =>[6,0]
+    puts '---- testing possible moves 2 (inside #check_possible_move_for)----'
+    moves = []
+    x = location[0].to_i
+    y = location[1].to_i
+
+    # p x
+    # p y
+
     case piece 
       when "♟"
         puts "this piece #{piece} is here #{location}"
+        puts " row is #{x} and column is #{y} and it is a white pawn" # 6,1
+        
+        p cannot_move = [[x+1,y+1],[x+1,y],[x+1,y-1],[x, y-1],[x, y+1]]
+             can_move = [[x-1,y-1],[x-1,y],[x-1,y+1]]
+        if x == 6
+          can_move << [x-2,y]
+        end  
+        puts "list of possible moves #{can_move}"
       end  
 
   end  
