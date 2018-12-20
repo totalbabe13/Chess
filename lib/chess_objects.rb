@@ -67,11 +67,29 @@ class Chess_game
       from = [row,column]
       puts "- - - - -" 
       puts '' 
-      legal_move = find_player_input_coordinates(row,column)
+      player_input = find_player_input_coordinates(row,column)
+      # - - - - check for empty cell- - - - - - 
+       if  player_input == '-'
+         puts ''
+         puts "- - ERROR - -"
+         puts "YOU HAVE NOT CHOSEN A PIECE TO MOVE-- CELL EMPTY"
+         puts ''
+         legal_move = false
+       else 
+         # - - - - - check if piece belogs to player ------
+          if does_piece_belong_to_player(player_input) 
+            legal_move = true
+          else
+            puts ''
+            puts "- - ERROR - -"
+            puts "YOU HAVE SELECTED A PIECE THAT IS NOT YOURS"
+            puts ''
+            legal_move = false
+          end 
+       end 
     end
-    puts "You want to move your #{legal_move} that is located at row: #{row} and column: #{column} "
-    move_from = from
-    # return move_from
+    puts "You want to move your #{player_input} that is located at row: #{row} and column: #{column} "
+    return from 
   end 
 
   def ask_player_to_choose_destination
@@ -85,7 +103,7 @@ class Chess_game
       column = gets.chomp
       move_towards = [row,column] 
       puts ' - - - - -' 
-     legal_move_to = find_player_input_coordinates(row,column)
+      legal_move_to = find_player_input_coordinates(row,column)
     end
     puts "You want to move your piece to row: #{row} and column: #{column}: that is #{legal_move_to} "
     move_towards
@@ -96,6 +114,11 @@ class Chess_game
     towards = convert_user_input(finish)
     piece   = board[from[0]][from[1]]
     
+    puts '---- testing possible moves 1 ----'
+    puts "from is #{from}"
+    puts "towards is #{towards}"
+    check_possible_move_for(piece,from)
+
     board[from[0]][from[1]] = '-'
     board[towards[0]][towards[1]] = piece
   end 
@@ -134,6 +157,7 @@ class Chess_game
   end  
 
   def find_player_input_coordinates(x,y) 
+    piece = ''
     x = x.to_i
     x = x-1
     if x > 8
@@ -165,19 +189,34 @@ class Chess_game
        puts "Error: INVALID entry"
        return false
     end
-    if board[x][y] != '-'
-      p board[x][y]
-    else 
-      p 'EMPTY CELL'
-    end
-    piece = board[x][y]     
+    piece = board[x][y]
   end
 
-  # def does_piece_belong_to_player(piece)
-  #   turn # BLK or WHT
-  #   black_pieces = ['♖','♘','♗','♕','♔','♙']
-  #   white_pieces = ['♜','♞','♝','♛','♚','♟']
+  def does_piece_belong_to_player(piece)
+    black_pieces = ['♖','♘','♗','♕','♔','♙']
+    white_pieces = ['♜','♞','♝','♛','♚','♟']
 
-  # end  
+    if self.turn == "WHITE" &&  white_pieces.include?(piece)
+      # puts "WHITE teams turn, with #{piece}"
+      return true
+    elsif self.turn == "BLACK" &&  black_pieces.include?(piece)
+      # puts "BLACK teams turn, with #{piece}"
+      return true
+    else  
+      # puts "test- 2 #{piece}"
+      return false
+    end
+  end 
+
+  def check_possible_move_for(piece,location)
+    puts '---- testing possible moves 2 ----'
+    # piece =>  ♖
+    # location  =>[6,0]
+    case piece 
+      when "♟"
+        puts "this piece #{piece} is here #{location}"
+      end  
+
+  end  
 
 end #end of chess	
