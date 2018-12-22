@@ -5,15 +5,15 @@ class Chess_game
 	attr_accessor :board, :player_one, :player_two, :turn
 
 	def initialize(p1,p2)
-	    @player_one = [p1,['none captured']] #white
-      @player_two = [p2,['none captured']] #black
+	    @player_one = [p1,[]] #white
+      @player_two = [p2,[]] #black
       @turn       = "WHITE"
       @board = [
         ['♖','♘','♗','♕','♔','♗','♘','♖'], #black
         ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
         ['-','-','-','-','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','-','-','-','-','-'],
+        ['-','-','-','♜','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
         ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
         ['♜','♞','♝','♛','♚','♝','♞','♜']  #white
@@ -33,10 +33,10 @@ class Chess_game
     system("clear")
     10.times { |i| puts " " }
     i = 0
-    puts "It is now the #{turn} team's turn --> #{player} ITS YOUR MOVE!"
+    puts "It is now the #{turn} team's turn --> #{player[0]} ITS YOUR MOVE!"
     puts ''
     puts ''
-    puts "PLAYER TWO: #{player_two[0]}"
+    puts "PLAYER TWO: #{player_two[0]} captured pieces : #{player_two[1]}"
     puts ''
     puts "     A   B   C   D   E   F   G   H"
     puts "   _________________________________"
@@ -48,7 +48,7 @@ class Chess_game
     puts ''
     puts "     A   B   C   D   E   F   G   H"
     puts ''
-    puts "PLAYER ONE: #{player_one[0]}"
+    puts "PLAYER ONE: #{player_one[0]}, captured pieces : #{player_one[1]}"
     2.times { |i| puts " " } 
      move_piece(ask_player_to_select_piece,ask_player_to_choose_destination)
 
@@ -113,14 +113,33 @@ class Chess_game
     from    = convert_user_input(start)
     towards = convert_user_input(finish)
     piece   = board[from[0]][from[1]]
+    other_piece = board[towards[0]][towards[1]]
     
     puts '---- testing possible moves 1 (inside #move_piece) ----'
     puts "from is  row-> #{from[0]} and column-> #{from[1]} }"
     puts "towards is #{towards}"
-    check_possible_move_for(piece,from)
+    puts "find piece if trying to capture #{board[towards[0]][towards[1]]}"
+    #check_possible_move_for(piece,from,towards)
 
-    board[from[0]][from[1]] = '-'
-    board[towards[0]][towards[1]] = piece
+     if check_possible_move_for(piece,from,towards).include?(towards)
+      puts "TEST 3 - after #checking_for_possible moves -"
+
+      if other_piece != '-' && self.turn == "WHITE"
+        self.player_one[1] << other_piece
+      end
+
+      if other_piece != '-' && self.turn == "BLACK"
+        self.player_two[1] << other_piece
+      end
+
+      board[from[0]][from[1]] = '-'
+      board[towards[0]][towards[1]] = piece
+    else
+      puts "this move is ILLEGAL ERROR"  
+    end  
+
+    # board[from[0]][from[1]] = '-'
+    # board[towards[0]][towards[1]] = piece
   end 
 
   def change_player
@@ -208,26 +227,137 @@ class Chess_game
     end
   end 
 
-  def check_possible_move_for(piece,location)
+  def check_possible_move_for(piece,location,destination)
     puts '---- testing possible moves 2 (inside #check_possible_move_for)----'
-    moves = []
+    black_pieces = ['♖','♘','♗','♕','♔','♙']
+    white_pieces = ['♜','♞','♝','♛','♚','♟']
+
     x = location[0].to_i
     y = location[1].to_i
+
+
+    x_to = destination[0].to_i
+    y_to = destination[1].to_i
+    value_of_destination_cell = board[x_to][y_to]
+    
+   
 
     # p x
     # p y
 
     case piece 
+ # - - - - - - - WHITE PAWN - - - - - - - -     
       when "♟"
         puts "this piece #{piece} is here #{location}"
         puts " row is #{x} and column is #{y} and it is a white pawn" # 6,1
+        can_move  = []#[[x-1,y]]
+        capture   = [[x-1,y-1],[x-1,y+1]]
+        capturing = [board[x-1][y-1],board[x-1][y+1]]
+
         
-        p cannot_move = [[x+1,y+1],[x+1,y],[x+1,y-1],[x, y-1],[x, y+1]]
-             can_move = [[x-1,y-1],[x-1,y],[x-1,y+1]]
-        if x == 6
+        if board[x-1][y] == '-'
+          can_move << [x-1,y]
+        end
+          
+        if x == 6 && board[x-1][y] == '-' && board[x-2][y] == '-'
           can_move << [x-2,y]
         end  
-        puts "list of possible moves #{can_move}"
+        
+        if black_pieces.include?(capturing[0]) 
+          can_move << capture[0]
+        end  
+        if black_pieces.include?(capturing[1]) 
+          can_move << capture[1]  
+        end  
+
+        if can_move.empty?
+          puts "NO LEGAL MOVES"
+        end  
+
+        puts "list of possible moves -->#{can_move}"
+        # puts "list of illegal moves --> #{cannot_move}"
+        return can_move
+ # - - - - - - - WHITE PAWN - - - - - - - -
+
+ # - - - - - - - BLACK PAWN - - - - - - - -
+      when "♙"
+        puts "this piece #{piece} is here #{location}"
+        puts " row is #{x} and column is #{y} and it is a black pawn" # 6,1
+        can_move  = []#[[x-1,y]]
+        capture   = [[x+1,y-1],[x+1,y+1]]
+        capturing = [board[x+1][y-1],board[x+1][y+1]]
+
+        if board[x+1][y] == '-'
+          can_move << [x+1,y]
+        end
+          
+        if x == 1 && board[x+1][y] == '-' && board[x+2][y] == '-'
+          can_move << [x+2,y]
+        end  
+        
+        if white_pieces.include?(capturing[0]) 
+          can_move << capture[0]
+        end  
+        if white_pieces.include?(capturing[1]) 
+          can_move << capture[1]  
+        end  
+
+        if can_move.empty?
+          puts "NO LEGAL MOVES"
+        end  
+
+        puts "list of possible moves -->#{can_move}"
+        # puts "list of illegal moves --> #{cannot_move}"
+        return can_move
+  # - - - - - - - BLACK PAWN - - - - - - - -
+
+  # - - - - - - - WHITE ROOK - - - - - - - -
+       when "♜"
+        can_move  = []
+        horizontal  = board[x]        # ["-", "-", "-", "♜", "-", "-", "-", "-"]
+        trans_board = board.transpose
+        vertical    = trans_board[y]  #["♕", "♙", "-", "-", "♜", "-", "♟", "♛"]
+         puts ""
+         puts "ROOK VARIABLES:" 
+         puts "piece--> #{piece}   (location)--> #{location}  (destination)--> #{destination}"
+         puts "X -->#{x}, Y-->#{y} TURN--> #{turn}"
+         puts "horizontal    : #{board[x]}"
+         puts "vertical : #{vertical}"
+         #left of ROOK
+         left_move = y-1
+         while left_move > -1
+          if horizontal[left_move] == '-'
+            can_move << [x,left_move]
+          end
+
+          if black_pieces.include?(horizontal[left_move])
+            can_move << [x,left_move]
+            break if black_pieces.include?(horizontal[left_move])
+          end 
+          break if white_pieces.include?(horizontal[left_move]) 
+          left_move -= 1
+         end 
+       
+         #MAPING ROW TO THE RIGHT
+         right_move = y+1
+         while right_move < 8
+          
+          if horizontal[right_move] == '-'
+            can_move << [x,right_move]
+          end
+
+          if black_pieces.include?(horizontal[right_move])
+            can_move << [x,right_move]
+            break if black_pieces.include?(horizontal[right_move])
+          end 
+          break if white_pieces.include?(horizontal[right_move]) 
+          right_move += 1
+         end 
+         puts "can move array --> #{can_move}"
+
+
+  # - - - - - - - WHITE ROOK - - - - - - - -
+        
       end  
 
   end  
