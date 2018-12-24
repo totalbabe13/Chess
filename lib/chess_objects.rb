@@ -7,13 +7,13 @@ class Chess_game
 	def initialize(p1,p2)
 	    @player_one = [p1,[]] #white
       @player_two = [p2,[]] #black
-      @turn       = "WHITE"
+      @turn       = "BLACK"
       @board = [
         ['♖','♘','♗','♕','♔','♗','♘','♖'], #black
         ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
         ['-','-','-','-','-','-','-','-'],
+        ['-','-','-','♖','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','♜','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
         ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
         ['♜','♞','♝','♛','♚','♝','♞','♜']  #white
@@ -282,7 +282,7 @@ class Chess_game
  # - - - - - - - BLACK PAWN - - - - - - - -
       when "♙"
         puts "this piece #{piece} is here #{location}"
-        puts " row is #{x} and column is #{y} and it is a black pawn" # 6,1
+        puts "row is #{x} and column is #{y} and it is a black pawn" # 6,1
         can_move  = []#[[x-1,y]]
         capture   = [[x+1,y-1],[x+1,y+1]]
         capturing = [board[x+1][y-1],board[x+1][y+1]]
@@ -314,16 +314,9 @@ class Chess_game
   # - - - - - - - WHITE ROOK - - - - - - - -
        when "♜"
         can_move  = []
-        horizontal  = board[x]        # ["-", "-", "-", "♜", "-", "-", "-", "-"]
-        trans_board = board.transpose
-        vertical    = trans_board[y]  #["♕", "♙", "-", "-", "♜", "-", "♟", "♛"]
-         puts ""
-         puts "ROOK VARIABLES:" 
-         puts "piece--> #{piece}   (location)--> #{location}  (destination)--> #{destination}"
-         puts "X -->#{x}, Y-->#{y} TURN--> #{turn}"
-         puts "horizontal    : #{board[x]}"
-         puts "vertical : #{vertical}"
-         #left of ROOK
+        horizontal  = board[x]     
+        
+         #MAPING ROW TO THE LEFT
          left_move = y-1
          while left_move > -1
           if horizontal[left_move] == '-'
@@ -353,10 +346,118 @@ class Chess_game
           break if white_pieces.include?(horizontal[right_move]) 
           right_move += 1
          end 
-         puts "can move array --> #{can_move}"
+        
+         #MAPING COLUMN FOWRWARD
+          forward_move = x+1
+          while forward_move < 8
+                                            
+            if board[forward_move][y] == '-'
+              can_move << [forward_move,y]
+            end
+
+            if black_pieces.include?(board[forward_move][y])
+              can_move << [forward_move,y]
+              break if black_pieces.include?(board[forward_move][y])
+            end
+
+            break if white_pieces.include?(board[forward_move][y])
+            forward_move += 1
+          end 
+
+          #MAPING COLUMN BACKWARD
+          backward_move = x-1
+          while backward_move > -1
+                                           
+            if board[backward_move][y] == '-'
+              can_move << [backward_move,y]
+            end
+
+            if black_pieces.include?(board[backward_move][y])
+              can_move << [backward_move,y]
+              break if black_pieces.include?(board[backward_move][y])
+            end
+
+            break if white_pieces.include?(board[backward_move][y])
+            backward_move -= 1
+          end 
+       
 
 
   # - - - - - - - WHITE ROOK - - - - - - - -
+
+  # - - - - - - - BLACK ROOK - - - - - - - -
+
+when "♖"
+        can_move  = []
+        horizontal  = board[x]     
+        
+         #MAPING ROW TO THE LEFT
+         left_move = y-1
+         while left_move > -1
+          if horizontal[left_move] == '-'
+            can_move << [x,left_move]
+          end
+
+          if white_pieces.include?(horizontal[left_move])
+            can_move << [x,left_move]
+            break if white_pieces.include?(horizontal[left_move])
+          end 
+          break if black_pieces.include?(horizontal[left_move]) 
+          left_move -= 1
+         end 
+       
+         #MAPING ROW TO THE RIGHT
+         right_move = y+1
+         while right_move < 8
+          
+          if horizontal[right_move] == '-'
+            can_move << [x,right_move]
+          end
+
+          if white_pieces.include?(horizontal[right_move])
+            can_move << [x,right_move]
+            break if white_pieces.include?(horizontal[right_move])
+          end 
+          break if black_pieces.include?(horizontal[right_move]) 
+          right_move += 1
+         end 
+        
+         #MAPING COLUMN FOWRWARD
+          forward_move = x+1
+          while forward_move < 8
+                                            
+            if board[forward_move][y] == '-'
+              can_move << [forward_move,y]
+            end
+
+            if white_pieces.include?(board[forward_move][y])
+              can_move << [forward_move,y]
+              break if white_pieces.include?(board[forward_move][y])
+            end
+
+            break if black_pieces.include?(board[forward_move][y])
+            forward_move += 1
+          end 
+
+          #MAPING COLUMN BACKWARD
+          backward_move = x-1
+          while backward_move > -1
+                                           
+            if board[backward_move][y] == '-'
+              can_move << [backward_move,y]
+            end
+
+            if white_pieces.include?(board[backward_move][y])
+              can_move << [backward_move,y]
+              break if white_pieces.include?(board[backward_move][y])
+            end
+
+            break if black_pieces.include?(board[backward_move][y])
+            backward_move -= 1
+          end 
+         puts "can move array --> #{can_move}"
+
+  # - - - - - - - BLACK ROOK - - - - - - - -
         
       end  
 
