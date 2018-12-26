@@ -7,15 +7,15 @@ class Chess_game
 	def initialize(p1,p2)
 	    @player_one = [p1,[]] #white
       @player_two = [p2,[]] #black
-      @turn       = "BLACK"
+      @turn       = "WHITE"
       @board = [
         ['♖','♘','♗','♕','♔','♗','♘','♖'], #black
         ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
         ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','♖','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
-        ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
+        ['-','-','-','-','-','-','-','-'],
+        ['♟','♟','♟','♞','♟','♟','♟','♟'], #white
         ['♜','♞','♝','♛','♚','♝','♞','♜']  #white
       ]
 	end	
@@ -123,7 +123,8 @@ class Chess_game
 
      if check_possible_move_for(piece,from,towards).include?(towards)
       puts "TEST 3 - after #checking_for_possible moves -"
-
+                          #   |
+      #CAPTURE MECHANISM HERE v
       if other_piece != '-' && self.turn == "WHITE"
         self.player_one[1] << other_piece
       end
@@ -387,7 +388,7 @@ class Chess_game
 
   # - - - - - - - BLACK ROOK - - - - - - - -
 
-when "♖"
+      when "♖"
         can_move  = []
         horizontal  = board[x]     
         
@@ -455,12 +456,210 @@ when "♖"
             break if black_pieces.include?(board[backward_move][y])
             backward_move -= 1
           end 
-         puts "can move array --> #{can_move}"
+        
 
   # - - - - - - - BLACK ROOK - - - - - - - -
-        
-      end  
 
-  end  
+  # - - - - - - - WHITE BISHOP - - - - - - - -
+        when "♝"
+          can_move  = []
+
+          #MAPING Diagonal  x+1, y+1
+          diagonal_1 = [x+1,y+1]
+          while diagonal_1[0] < 8 && diagonal_1[1] < 8
+            
+            if board[diagonal_1[0]][diagonal_1[1]] == '-'
+              can_move <<[ diagonal_1[0], diagonal_1[1] ]
+            end
+            
+            if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+              can_move << [ diagonal_1[0], diagonal_1[1] ]
+              break if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+            end
+
+            break if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+
+            diagonal_1[0] += 1
+            diagonal_1[1] += 1
+            
+          end  
+
+          #MAPING Diagonal  x-1, y-1
+          diagonal_1 = [x-1,y-1]
+          while diagonal_1[0] < 8 && diagonal_1[1] < 8
+            
+            if board[diagonal_1[0]][diagonal_1[1]] == '-'
+              can_move <<[ diagonal_1[0], diagonal_1[1] ]
+            end
+            
+            if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+              can_move << [ diagonal_1[0], diagonal_1[1] ]
+              break if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+            end
+
+            break if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+
+            diagonal_1[0] -= 1
+            diagonal_1[1] -= 1
+            
+          end  
+
+          #MAPING Diagonal  x+1, y-1
+          diagonal_1 = [x+1,y-1]
+          while diagonal_1[0] < 8 && diagonal_1[1] < 8
+            
+            if board[diagonal_1[0]][diagonal_1[1]] == '-'
+              can_move <<[ diagonal_1[0], diagonal_1[1] ]
+            end
+            
+            if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+              can_move << [ diagonal_1[0], diagonal_1[1] ]
+              break if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+            end
+
+            break if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+
+            diagonal_1[0] += 1
+            diagonal_1[1] -= 1
+            
+          end
+
+          # #MAPING Diagonal  x-1, y+1
+          diagonal_1 = [x-1,y+1]
+          while diagonal_1[0] < 8 && diagonal_1[1] < 8
+            
+            if board[diagonal_1[0]][diagonal_1[1]] == '-'
+              can_move <<[ diagonal_1[0], diagonal_1[1] ]
+            end
+            
+            if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+              can_move << [ diagonal_1[0], diagonal_1[1] ]
+              break if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+            end
+
+            break if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+
+            diagonal_1[0] -= 1
+            diagonal_1[1] += 1
+            
+          end  
+           
+  # - - - - - - - WHITE BISHOP - - - - - - - -
+
+  # - - - - - - - BLACK BISHOP - - - - - - - -
+        when "♗"
+          can_move  = []
+
+          #MAPING Diagonal  x+1, y+1
+          diagonal_1 = [x+1,y+1]
+          while diagonal_1[0] < 8 && diagonal_1[1] < 8
+            
+            if board[diagonal_1[0]][diagonal_1[1]] == '-'
+              can_move <<[ diagonal_1[0], diagonal_1[1] ]
+            end
+            
+            if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+              can_move << [ diagonal_1[0], diagonal_1[1] ]
+              break if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+            end
+
+            break if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+
+            diagonal_1[0] += 1
+            diagonal_1[1] += 1
+            
+          end  
+
+          #MAPING Diagonal  x-1, y-1
+          diagonal_1 = [x-1,y-1]
+          while diagonal_1[0] < 8 && diagonal_1[1] < 8
+            
+            if board[diagonal_1[0]][diagonal_1[1]] == '-'
+              can_move <<[ diagonal_1[0], diagonal_1[1] ]
+            end
+            
+            if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+              can_move << [ diagonal_1[0], diagonal_1[1] ]
+              break if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+            end
+
+            break if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+
+            diagonal_1[0] -= 1
+            diagonal_1[1] -= 1
+            
+          end  
+
+          #MAPING Diagonal  x+1, y-1
+          diagonal_1 = [x+1,y-1]
+          while diagonal_1[0] < 8 && diagonal_1[1] < 8
+            
+            if board[diagonal_1[0]][diagonal_1[1]] == '-'
+              can_move <<[ diagonal_1[0], diagonal_1[1] ]
+            end
+            
+            if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+              can_move << [ diagonal_1[0], diagonal_1[1] ]
+              break if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+            end
+
+            break if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+
+            diagonal_1[0] += 1
+            diagonal_1[1] -= 1
+            
+          end
+
+          # #MAPING Diagonal  x-1, y+1
+          diagonal_1 = [x-1,y+1]
+          while diagonal_1[0] < 8 && diagonal_1[1] < 8
+            
+            if board[diagonal_1[0]][diagonal_1[1]] == '-'
+              can_move <<[ diagonal_1[0], diagonal_1[1] ]
+            end
+            
+            if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+              can_move << [ diagonal_1[0], diagonal_1[1] ]
+              break if white_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+            end
+
+            break if black_pieces.include?(board[diagonal_1[0]][diagonal_1[1]])
+
+            diagonal_1[0] -= 1
+            diagonal_1[1] += 1
+            
+          end  
+            
+  # - - - - - - - BLACK BISHOP - - - - - - - -
+
+  # - - - - - - - WHITE KNIGHT - - - - - - - -
+        
+         when "♞"
+          can_move  = []
+          moves = [[x+1,y+2],[x-1,y+2],[x-1,y-2],[x+1,y-2],
+                   [x+2,y+1],[x+2,y-1],[x-2,y+1],[x-2,y-1]]
+
+          moves.delete_if do |move|
+             board[move[0]][move[1]] != nil
+          end  
+
+
+          moves.each do |move|
+            if board[move[0]][move[1]] == '-'
+              can_move << move 
+            end 
+
+            if black_pieces.include?(board[move[0]][move[1]])
+              can_move << move   
+            end
+          end     
+          puts "knight moves --> #{can_move}"
+
+  # - - - - - - - WHITE KNIGHT - - - - - - - -
+
+
+        
+      end#end of case  
+  end #end of check_possible_moves 
 
 end #end of chess	
