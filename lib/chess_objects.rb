@@ -16,7 +16,7 @@ class Chess_game
         ['-','-','-','-','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
         ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
-        ['♜','♞','♝','♕','♚','♝','♞','♜']  #white
+        ['♜','♞','♝','♛','♚','♝','♞','♜']  #white
       ]
 	end	
 
@@ -116,9 +116,9 @@ class Chess_game
     other_piece = board[towards[0]][towards[1]]
     
     puts '---- testing possible moves 1 (inside #move_piece) ----'
-    puts "from is  row-> #{from[0]} and column-> #{from[1]} }"
-    puts "towards is #{towards}"
-    puts "find piece if trying to capture #{board[towards[0]][towards[1]]}"
+    # puts "from is  row-> #{from[0]} and column-> #{from[1]} }"
+    # puts "towards is #{towards}"
+    # puts "find piece if trying to capture #{board[towards[0]][towards[1]]}"
     #check_possible_move_for(piece,from,towards)
 
      if check_possible_move_for(piece,from,towards).include?(towards)
@@ -229,7 +229,7 @@ class Chess_game
   end 
 
   def check_possible_move_for(piece,location,destination)
-    puts '---- testing possible moves 2 (inside #check_possible_move_for)----'
+    puts '----(inside #check_possible_move_for)----'
     black_pieces = ['♖','♘','♗','♕','♔','♙']
     white_pieces = ['♜','♞','♝','♛','♚','♟']
     x = location[0].to_i
@@ -248,8 +248,8 @@ class Chess_game
     case piece 
   # - - - - - - - WHITE PAWN - - - - - - - -     
       when "♟"
-        puts "this piece #{piece} is here #{location}"
-        puts " row is #{x} and column is #{y} and it is a white pawn" # 6,1
+        # puts "this piece #{piece} is here #{location}"
+        # puts " row is #{x} and column is #{y} and it is a white pawn" # 6,1
         can_move  = []#[[x-1,y]]
         capture   = [[x-1,y-1],[x-1,y+1]]
         capturing = [board[x-1][y-1],board[x-1][y+1]]
@@ -271,17 +271,17 @@ class Chess_game
         end  
 
         if can_move.empty?
-          puts "NO LEGAL MOVES"
+          # puts "NO LEGAL MOVES"
         end  
 
-        puts "list of possible moves -->#{can_move}"
+        # puts "list of possible moves -->#{can_move}"
         # puts "list of illegal moves --> #{cannot_move}"
         return can_move
   # - - - - - - - WHITE PAWN - - - - - - - -
   # - - - - - - - BLACK PAWN - - - - - - - -
       when "♙"
-        puts "this piece #{piece} is here #{location}"
-        puts "row is #{x} and column is #{y} and it is a black pawn" # 6,1
+        # puts "this piece #{piece} is here #{location}"
+        # puts "row is #{x} and column is #{y} and it is a black pawn" # 6,1
         can_move  = []#[[x-1,y]]
         capture   = [[x+1,y-1],[x+1,y+1]]
         capturing = [board[x+1][y-1],board[x+1][y+1]]
@@ -302,10 +302,10 @@ class Chess_game
         end  
 
         if can_move.empty?
-          puts "NO LEGAL MOVES"
+          # puts "NO LEGAL MOVES"
         end  
 
-        puts "list of possible moves -->#{can_move}"
+        # puts "list of possible moves -->#{can_move}"
         # puts "list of illegal moves --> #{cannot_move}"
         return can_move
   # - - - - - - - BLACK PAWN - - - - - - - -
@@ -959,29 +959,76 @@ class Chess_game
   # - - - - - - - BLACK QUEEN - - - - - - - -        
   # - - - - - - - WHITE KING - - - - - - - -
       when "♚"
+        other_black_pieces = ['♖','♘','♗','♕','♔']
+        king_moves = [[x,y-1],[x+1,y-1],[x+1,y],[x+1,y+1],[x,y+1],[x-1,y+1],[x-1,y],[x-1,y-1]]
         look_for_check_mate = []
+        pawns = []
+        king_cannot_move = []
+        
         i = 0
         while i < 8
           j = 0 
           while j < 8
             obj = [board[i][j],[i,j]]
-            if black_pieces.include?(board[i][j])
+            if obj[0] == '♙'
+              pawns << obj
+            end  
+            if other_black_pieces.include?(board[i][j])
+              puts "obj --> #{obj}"
               look_for_check_mate << obj
             end
             j+=1
           end
           i += 1
         end       
-        puts "list of all pieces with coordinates #{look_for_check_mate}" 
+        puts "list of all pieces with coordinates #{look_for_check_mate}" # ["♙", [1, 0]]
+        #puts " list of all pawns --> #{pawns}"
+        pawn_move =[]
+        pawns.each do |pawn|  
+          if pawn[1][0] < 7 && pawn[1][1] < 7
+            # puts  " -->1  testing edge of pawn  X1: #{pawn[1][0] + 1}, Y1: #{pawn[1][1] + 1} "  
+            if board[pawn[1][0] + 1][pawn[1][1] + 1] == '-' 
+               pawn_move << [pawn[1][0] + 1, pawn[1][1] + 1]
+            end   
+          end
 
-            
+          if pawn[1][0] < 7 && pawn[1][1] > 0
+            # puts " -->2  testing edge of pawn  X2: #{pawn[1][0] + 1}, Y2: #{pawn[1][1] + 1} "
+            if board[pawn[1][0] + 1][pawn[1][1] - 1] == '-' 
+               pawn_move << [pawn[1][0] + 1, pawn[1][1] - 1]
+            end   
+          end
+
+        end
+        # puts "pawn_move --> #{pawn_move.uniq!}"
+        king_cannot_move << pawn_move.uniq!
+        puts "--testing king check case --"
+        
+        look_for_check_mate.each do |item|
+          piece_obj = check_possible_move_for(item[0],item[1],['inv','inv'])
+            if piece_obj != []
+              king_cannot_move << piece_obj
+            end  
+        end 
+        puts "-- flatten array of moves --"
          
+        king_cannot_move.uniq!
+        king_cannot_move.flatten!(1)
+        king_cannot_move.uniq!
+
+
+        king_moves.each do |move|
+          if move[0][0] > 8
+          p move
+          end 
+        end 
+        puts " king_moves #{king_moves}"  
+        #king_cannot_move.uniq!   
+        #  puts " king_cannot_move --> #{king_cannot_move}"
   # - - - - - - - WHITE KING - - - - - - - -
   # - - - - - - - BLACK KING - - - - - - - -
   # - - - - - - - BLACK KING - - - - - - - -
-
-
-        
+ 
       end#end of case  
   end #end of check_possible_moves 
 
