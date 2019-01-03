@@ -7,13 +7,13 @@ class Chess_game
 	def initialize(p1,p2)
 	    @player_one = [p1,[]] #white
       @player_two = [p2,[]] #black
-      @turn       = "BLACK" # "BLACK" or "WHITE"
+      @turn       = "WHITE" # "BLACK" or "WHITE"
       @board = [
-        ['♖','♘','♙','♕','-','♗','♘','♖'], #black
+        ['♖','♘','♙','♕','♔','♗','♘','♖'], #black
         ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
         ['-','-','-','-','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','♔','-','-','-','-'],
+        ['-','-','-','-','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
         ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
         ['♜','♞','♝','♛','♚','♝','♞','♜']  #white
@@ -59,10 +59,11 @@ class Chess_game
   def ask_player_to_select_piece
     legal_move = false
     until legal_move != false
+      puts " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
       puts " S E L E C T    T H E    P I E C E   Y O U   W A N T   T O   M O V E"
-      puts "TYPE  the ROW (1-8) of the piece you want to move: and press ENTER"
+      puts "TYPE the ROW (1-8): and press ENTER"
       row = gets.chomp
-      puts 'TYPE in the COLUMN (a - h / A - H) of the piece you want to move:  and press ENTER'
+      puts 'TYPE the COLUMN (a - h / A - H):  and press ENTER'
       column = gets.chomp
       from = [row,column]
       puts "- - - - -" 
@@ -234,17 +235,10 @@ class Chess_game
     white_pieces = ['♜','♞','♝','♛','♚','♟']
     x = location[0].to_i
     y = location[1].to_i
-
-
     x_to = destination[0].to_i
     y_to = destination[1].to_i
     value_of_destination_cell = board[x_to][y_to]
     
-   
-
-    # p x
-    # p y
-
     case piece 
   # - - - - - - - WHITE PAWN - - - - - - - -     
       when "♟"
@@ -978,7 +972,7 @@ class Chess_game
             end 
 
             if obj[0] == '♔'
-              other_king << obj[0]
+              other_king << obj
             end  
 
             if other_black_pieces.include?(board[i][j])
@@ -996,7 +990,6 @@ class Chess_game
                pawn_move << [pawn[1][0] + 1, pawn[1][1] + 1]
             end   
           end
-
           if pawn[1][0] < 7 && pawn[1][1] > 0
             if board[pawn[1][0] + 1][pawn[1][1] - 1] == '-' 
                pawn_move << [pawn[1][0] + 1, pawn[1][1] - 1]
@@ -1005,19 +998,28 @@ class Chess_game
 
         end
         king_cannot_move << pawn_move.uniq!
+
         look_for_check_mate.each do |item|
           piece_obj = check_possible_move_for(item[0],item[1],['inv','inv'])
             if piece_obj != []
               king_cannot_move << piece_obj
             end  
-        end 
-        king_cannot_move.uniq!
+        end
+
+        other_king.flatten!(1)
+        a = other_king[1][0] #row
+        b = other_king[1][1] #column
+        move_map_other_king = [[a,b-1],[a+1,b-1],[a+1,b],[a+1,b+1],[a,b+1],[a-1,b+1],[a-1,b],[a-1,b-1]]
+        move_map_other_king.delete_if do |item|
+          ((0..7) === item[0] && (0..7) === item[1]) == false     
+        end
+
+        king_cannot_move << move_map_other_king    
         king_cannot_move.flatten!(1)
         king_cannot_move.uniq!
 
         king_moves.each do |move|
           if (0..7) === move[0] && (0..7) === move[1]
-           
             if white_pieces.include?(board[move[0]][move[1]]) == false
               legal_moves << move 
             end  
@@ -1028,118 +1030,93 @@ class Chess_game
             all_moves << move
           end  
         end 
- 
+        puts "all moves -> #{all_moves}"
         return all_moves
   # - - - - - - - WHITE KING - - - - - - - -
   # - - - - - - - BLACK KING - - - - - - - -
-   when "♔"
-    other_white_pieces = ['♜','♞','♝','♛']
-    king_moves = [[x,y-1],[x+1,y-1],[x+1,y],[x+1,y+1],[x,y+1],[x-1,y+1],[x-1,y],[x-1,y-1]]
-    look_for_check_mate = []
-    pawns = []
-    other_king = []
-    other_king_moves = []
-    king_cannot_move = []
-    legal_moves = []
-    all_moves = []
-
-        
+      when "♔"
+        other_white_pieces = ['♜','♞','♝','♛']
+        king_moves = [[x,y-1],[x+1,y-1],[x+1,y],[x+1,y+1],[x,y+1],[x-1,y+1],[x-1,y],[x-1,y-1]]
+        look_for_check_mate = []
+        pawns = []
+        other_king = []
+        other_king_moves = []
+        king_cannot_move = []
+        legal_moves = []
+        all_moves = []
         #MAPPING all pieces that belong to other player
-    i = 0
-    while i < 8
-      j = 0 
-      while j < 8
-        obj = [board[i][j],[i,j]]
+        i = 0
+        while i < 8
+          j = 0 
+          while j < 8
+            obj = [board[i][j],[i,j]]
             #PAWNS get dealt with separatly 
-        if obj[0] == '♟'
-          pawns << obj
+            if obj[0] == '♟'
+              pawns << obj
+            end 
+            #Cannot check/ check mate other king
+            if obj[0] == '♚'
+              other_king << obj
+            end  
+            #all other pieces can be gropuped in seprate array
+            if other_white_pieces.include?(board[i][j])
+              look_for_check_mate << obj
+            end
+            j+=1
+          end
+          i += 1
+        end           
+        #plotting all potential capture moves for other player's pawns
+        pawn_move =[]
+        pawns.each do |pawn|  
+          if pawn[1][0] > 0 && pawn[1][1] > 0  
+            if board[pawn[1][0] - 1][pawn[1][1] - 1] == '-' 
+              pawn_move << [pawn[1][0] - 1, pawn[1][1] - 1]
+            end   
+          end
+
+          if pawn[1][0] > 0 && pawn[1][1] < 7
+            if board[pawn[1][0] - 1][pawn[1][1] + 1] == '-' 
+              pawn_move << [pawn[1][0] - 1, pawn[1][1] + 1]
+            end   
+          end
+        end
+        king_cannot_move << pawn_move.uniq!
+        
+        look_for_check_mate.each do |item|
+          piece_obj = check_possible_move_for(item[0],item[1],['inv','inv']) 
+          if piece_obj != []
+            king_cannot_move << piece_obj
+          end  
         end 
 
-        if obj[0] == '♚'
-          other_king << obj
-        end  
-            #all other pieces can be gropuped in seprate array
-        if other_white_pieces.include?(board[i][j])
-          look_for_check_mate << obj
+        other_king.flatten!(1)
+        a = other_king[1][0]
+        b = other_king[1][1]
+        move_map_other_king = [[a,b-1],[a+1,b-1],[a+1,b],[a+1,b+1],[a,b+1],[a-1,b+1],[a-1,b],[a-1,b-1]]
+        move_map_other_king.delete_if do |item|
+          ((0..7) === item[0] && (0..7) === item[1]) == false     
         end
-        j+=1
-      end
-      i += 1
-    end 
-         
-          
-        #plotting all potential capture moves for other player's pawns
-    pawn_move =[]
-    pawns.each do |pawn|  
-      if pawn[1][0] > 0 && pawn[1][1] > 0  
-        if board[pawn[1][0] - 1][pawn[1][1] - 1] == '-' 
-            pawn_move << [pawn[1][0] - 1, pawn[1][1] - 1]
-        end   
-      end
-
-      if pawn[1][0] > 0 && pawn[1][1] < 7
-        if board[pawn[1][0] - 1][pawn[1][1] + 1] == '-' 
-            pawn_move << [pawn[1][0] - 1, pawn[1][1] + 1]
-        end   
-      end
-    end
-
-    puts "pawn_move --> #{pawn_move}"
-    puts "look_for_check_mate--> #{look_for_check_mate}"
-    king_cannot_move << pawn_move.uniq!
-        
-    look_for_check_mate.each do |item|
-      piece_obj = check_possible_move_for(item[0],item[1],['inv','inv']) 
-      if piece_obj != []
-        king_cannot_move << piece_obj
-      end  
-    end 
-
-    other_king.flatten!(1)
-    a = other_king[1][0]
-    b = other_king[1][1]
-    move_map_other_king = [[a,b-1],[a+1,b-1],[a+1,b],[a+1,b+1],[a,b+1],[a-1,b+1],[a-1,b],[a-1,b-1]]
-    p move_map_other_king
-    move_map_other_king.each do |move|
-      if (0..7) === move[0] && (0..7) === move[1]
-        p move
-        king_cannot_move << move
-      end     
-    end 
-
-    # king_cannot_move.uniq!
-     king_cannot_move.flatten!(1)
-    # king_cannot_move.uniq!
-    puts "king_cannot_move --> #{king_cannot_move}"
-    puts "king_moves--> #{king_moves}"
-
-    # king_moves.each do |move|
-    #   if (0..7) === move[0] && (0..7) === move[1]
-    #     p move
-    #     if black_pieces.include?(board[move[0]][move[1]]) == false
-    #       legal_moves << move 
-    #     end  
-    #   end     
-    # end 
-    # puts "legal moves--> #{legal_moves}"
-
-    # legal_moves.map! do |move|
-    #   if (king_cannot_move.include?(move)) == false
-    #     all_moves << move
-    #   end  
-    # end
-     
+        king_cannot_move << move_map_other_king    
+        king_cannot_move.flatten!(1)
+        king_cannot_move.uniq!
     
-    
-     
+        king_moves.each do |move|
+          if (0..7) === move[0] && (0..7) === move[1]
+            if black_pieces.include?(board[move[0]][move[1]]) == false
+          legal_moves << move 
+            end  
+          end     
+        end 
 
-   puts "all_moves --> #{all_moves} "
-
-  #   return all_moves
-
-
+        legal_moves.map! do |move|
+          if (king_cannot_move.include?(move)) == false
+            all_moves << move
+          end  
+        end
+        puts "all_moves --> #{all_moves} "
+        return all_moves
   # - - - - - - - BLACK KING - - - - - - - -
- 
       end#end of case  
   end #end of check_possible_moves 
 
