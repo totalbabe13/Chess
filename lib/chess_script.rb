@@ -27,6 +27,7 @@ include Ui_messages
  	   
  	   while new_game.check_mate == false   
         new_game.print_board
+        #new_game.find_other_players_king
         new_game.change_player
         
        end 

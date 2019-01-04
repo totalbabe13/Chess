@@ -2,12 +2,13 @@
 
 class Chess_game
   # include Ui_messages
-	attr_accessor :board, :player_one, :player_two, :turn, :check_mate
+	attr_accessor :board, :player_one, :player_two, :turn, :check_mate, :check 
 
 	def initialize(p1,p2)
 	    @player_one = [p1,[]] #white
       @player_two = [p2,[]] #black
       @turn       = "WHITE" # "BLACK" or "WHITE"
+      @check = false
       @check_mate = false
       @board = [
         ['♖','♘','♙','♕','♔','♗','♘','♖'], #black
@@ -33,6 +34,19 @@ class Chess_game
 
     system("clear")
     10.times { |i| puts " " }
+
+    if self.check == true
+
+      if self.turn == "WHITE"
+        puts "#{player_two[0]} has put you into C-H-E-C-K-!!!"
+      end
+
+      if self.turn == "BLACK"
+        puts "#{player_one[0]} has put you into C-H-E-C-K-!!!"
+      end
+
+    end  
+
     i = 0
     puts "It is now the #{turn} team's turn --> #{player[0]} ITS YOUR MOVE!"
     puts ''
@@ -121,16 +135,19 @@ class Chess_game
     towards = convert_user_input(finish)
     piece   = board[from[0]][from[1]]
     other_piece = board[towards[0]][towards[1]]
-    
-    #puts '---- testing possible moves 1 (inside #move_piece) ----'
-    # puts "from is  row-> #{from[0]} and column-> #{from[1]} }"
-    # puts "towards is #{towards}"
-    # puts "find piece if trying to capture #{board[towards[0]][towards[1]]}"
-    #check_possible_move_for(piece,from,towards)
 
-     if check_possible_move_for(piece,from,towards).include?(towards)
+    # p find_other_players_king
+    if check_possible_move_for(piece,towards,['inv','inv']).include?(find_other_players_king[1])
+      puts "testing -- found king!"
+      self.check = true
+    else 
+      self.check = false  
+    end 
+
+    #puts '---- testing possible moves 1 (inside #move_piece) ----'
+    if check_possible_move_for(piece,from,towards).include?(towards)
       #puts "TEST 3 - after #checking_for_possible moves -"
-                          #   |
+      #                       |
       #CAPTURE MECHANISM HERE v
       if other_piece != '-' && self.turn == "WHITE"
         self.player_one[1] << other_piece
@@ -140,8 +157,24 @@ class Chess_game
         self.player_two[1] << other_piece
       end
 
+      #Check if move put other player in check
       board[from[0]][from[1]] = '-'
       board[towards[0]][towards[1]] = piece
+      future_moves = []
+
+      find_all_current_players_pieces.each do |item|
+        if item != [piece,from]
+          if check_possible_move_for(item[0],item[1],['inv','inv']) != []
+            future_moves << check_possible_move_for(item[0],item[1],['inv','inv'])
+          end 
+        end  
+      end 
+      
+      if future_moves.flatten!(1).include?(find_other_players_king[1])
+        self.check = true
+      end 
+      return true 
+
     else
       puts ''
       puts ''
@@ -149,10 +182,81 @@ class Chess_game
       puts "re-enter coordinates"
       return false  
     end  
-
-    # board[from[0]][from[1]] = '-'
-    # board[towards[0]][towards[1]] = piece
   end 
+
+  def find_all_current_players_pieces
+    current_player_pieces = []
+    
+    if self.turn == "WHITE"
+      white_pieces = ['♜','♞','♝','♛','♟','♚']
+      i = 0
+        while i < 8
+          j = 0 
+          while j < 8
+            obj = [board[i][j],[i,j]]
+            if white_pieces.include?(obj[0]) 
+              current_player_pieces << obj
+            end 
+            j+=1
+          end
+          i += 1
+        end
+        return current_player_pieces
+    end
+
+    if self.turn == "BLACK"
+      black_pieces = ['♖','♘','♗','♕','♔','♙']
+      i = 0
+        while i < 8
+          j = 0 
+          while j < 8
+            obj = [board[i][j],[i,j]]
+            if black_pieces.include?(obj[0]) 
+              current_player_pieces << obj
+            end 
+            j+=1
+          end
+          i += 1
+        end
+        return current_player_pieces
+    end
+  end  
+
+  def find_other_players_king
+    other_king = 'empty'
+   
+    if self.turn == "WHITE"
+      i = 0
+        while i < 8
+          j = 0 
+          while j < 8
+            obj = [board[i][j],[i,j]]
+            if obj[0] == '♔'
+              other_king = obj
+            end  
+            j+=1
+          end
+          i += 1
+        end
+    end
+        
+    if self.turn == "BLACK"
+      i = 0
+        while i < 8
+          j = 0 
+          while j < 8
+            obj = [board[i][j],[i,j]]
+            if obj[0] == '♚'
+              other_king = obj
+            end  
+            j+=1
+          end
+          i += 1
+        end
+    end
+    puts "INSIDE other players king function --> #{other_king}"        
+    return other_king           
+  end  
 
   def change_player
     if self.turn == 'WHITE'
@@ -252,12 +356,9 @@ class Chess_game
     case piece 
   # - - - - - - - WHITE PAWN - - - - - - - -     
       when "♟"
-        # puts "this piece #{piece} is here #{location}"
-        # puts " row is #{x} and column is #{y} and it is a white pawn" # 6,1
         can_move  = []#[[x-1,y]]
         capture   = [[x-1,y-1],[x-1,y+1]]
         capturing = [board[x-1][y-1],board[x-1][y+1]]
-
         
         if board[x-1][y] == '-'
           can_move << [x-1,y]
@@ -279,7 +380,6 @@ class Chess_game
         end  
 
         # puts "list of possible moves -->#{can_move}"
-        # puts "list of illegal moves --> #{cannot_move}"
         return can_move
   # - - - - - - - WHITE PAWN - - - - - - - -
   # - - - - - - - BLACK PAWN - - - - - - - -
@@ -1040,7 +1140,7 @@ class Chess_game
             all_moves << move
           end  
         end 
-        puts "all moves -> #{all_moves}"
+        #puts "all moves -> #{all_moves}"
         return all_moves
   # - - - - - - - WHITE KING - - - - - - - -
   # - - - - - - - BLACK KING - - - - - - - -
@@ -1124,7 +1224,7 @@ class Chess_game
             all_moves << move
           end  
         end
-        puts "all_moves --> #{all_moves} "
+        #puts "all_moves --> #{all_moves} "
         return all_moves
   # - - - - - - - BLACK KING - - - - - - - -
       end#end of case  
