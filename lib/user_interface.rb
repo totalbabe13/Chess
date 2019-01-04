@@ -27,7 +27,7 @@ module Ui_messages
   	puts"                                        \u00A9 Leonardo Kaplan - Totalbabe13 Productions \u2665 "
   	puts'                                    - - - - - - - - - - - - - - - - - - - - - - - - - - - -'
   	3.times { |i| puts " " }
-  	puts "                                                          --> PRESS ANY KEY <--"
+  	puts "                                                          --> PRESS ENTER <--"
   end	  
 
   def load_or_new

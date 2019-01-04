@@ -4,13 +4,19 @@ require_relative('user_interface')
 
 include Ui_messages
 
- welcome_message
+ welcome_message #UI message CHESS /PRESS ENTER
  user_response_1 = gets.chomp
 
  if user_response_1
- 	load_or_new
- 	
- 	user_response_2 = gets.chomp
+ 	# load_or_new #UI message 1 or 2
+ 	input_valid = false
+ 	while input_valid == false
+ 	  load_or_new #UI message 1 or 2	
+ 	  user_response_2 = gets.chomp
+ 	  if user_response_2 == '1' || user_response_2 == '2'
+ 	  	input_valid = true
+ 	  end	
+    end
  	if user_response_2 == '1'
  	   new_game_player1
  	     player_one = gets.chomp
