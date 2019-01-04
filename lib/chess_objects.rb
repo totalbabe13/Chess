@@ -2,12 +2,13 @@
 
 class Chess_game
   # include Ui_messages
-	attr_accessor :board, :player_one, :player_two, :turn
+	attr_accessor :board, :player_one, :player_two, :turn, :check_mate
 
 	def initialize(p1,p2)
 	    @player_one = [p1,[]] #white
       @player_two = [p2,[]] #black
       @turn       = "WHITE" # "BLACK" or "WHITE"
+      @check_mate = false
       @board = [
         ['♖','♘','♙','♕','♔','♗','♘','♖'], #black
         ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
@@ -50,8 +51,13 @@ class Chess_game
     puts ''
     puts "PLAYER ONE: #{player_one[0]}, captured pieces : #{player_one[1]}"
     2.times { |i| puts " " } 
-     move_piece(ask_player_to_select_piece,ask_player_to_choose_destination)
 
+    legal = false 
+    while legal == false
+      if move_piece(ask_player_to_select_piece,ask_player_to_choose_destination)
+        legal = true
+      end 
+    end   
     # ask_player_to_select_piece
     # ask_player_to_choose_destination
 	end	
@@ -116,14 +122,14 @@ class Chess_game
     piece   = board[from[0]][from[1]]
     other_piece = board[towards[0]][towards[1]]
     
-    puts '---- testing possible moves 1 (inside #move_piece) ----'
+    #puts '---- testing possible moves 1 (inside #move_piece) ----'
     # puts "from is  row-> #{from[0]} and column-> #{from[1]} }"
     # puts "towards is #{towards}"
     # puts "find piece if trying to capture #{board[towards[0]][towards[1]]}"
     #check_possible_move_for(piece,from,towards)
 
      if check_possible_move_for(piece,from,towards).include?(towards)
-      puts "TEST 3 - after #checking_for_possible moves -"
+      #puts "TEST 3 - after #checking_for_possible moves -"
                           #   |
       #CAPTURE MECHANISM HERE v
       if other_piece != '-' && self.turn == "WHITE"
@@ -137,7 +143,11 @@ class Chess_game
       board[from[0]][from[1]] = '-'
       board[towards[0]][towards[1]] = piece
     else
-      puts "this move is ILLEGAL ERROR"  
+      puts ''
+      puts ''
+      puts "ERROR:: ILLEGAL MOVE"
+      puts "re-enter coordinates"
+      return false  
     end  
 
     # board[from[0]][from[1]] = '-'
@@ -230,7 +240,7 @@ class Chess_game
   end 
 
   def check_possible_move_for(piece,location,destination)
-    puts '----(inside #check_possible_move_for)----'
+    #puts '----(inside #check_possible_move_for)----'
     black_pieces = ['♖','♘','♗','♕','♔','♙']
     white_pieces = ['♜','♞','♝','♛','♚','♟']
     x = location[0].to_i
