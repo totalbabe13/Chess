@@ -5,16 +5,16 @@ class Chess_game
 	attr_accessor :board, :player_one, :player_two, :turn, :check_mate, :check 
 
 	def initialize(p1,p2)
-	    @player_one = [p1,[]] #white
-      @player_two = [p2,[]] #black
+	    @player_one = [p1,[],[true]] #white
+      @player_two = [p2,[],[false]] #black
       @turn       = "WHITE" # "BLACK" or "WHITE"
       @check = false
       @check_mate = false
       @board = [
-        ['♖','♘','♙','♕','♔','♗','♘','♖'], #black
+        ['♖','♘','♙','♕','-','♗','♘','♖'], #black
         ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
         ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','-','-','-','-','-'],
+        ['-','♔','-','-','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
         ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
@@ -51,7 +51,7 @@ class Chess_game
     puts "It is now the #{turn} team's turn --> #{player[0]} ITS YOUR MOVE!"
     puts ''
     puts ''
-    puts "PLAYER TWO: #{player_two[0]} captured pieces : #{player_two[1]}"
+    puts "PLAYER TWO: #{player_two[0]} -- Captured pieces : #{player_two[1]} -- IN CHECK?-> #{player_two[2].to_s}"
     puts ''
     puts "     A   B   C   D   E   F   G   H"
     puts "   _________________________________"
@@ -63,7 +63,7 @@ class Chess_game
     puts ''
     puts "     A   B   C   D   E   F   G   H"
     puts ''
-    puts "PLAYER ONE: #{player_one[0]}, captured pieces : #{player_one[1]}"
+    puts "PLAYER ONE: #{player_one[0]} -- captured pieces : #{player_one[1]} -- IN CHECK?-> #{player_one[2].to_s}"
     2.times { |i| puts " " } 
 
     legal = false 
@@ -129,6 +129,20 @@ class Chess_game
     puts "You want to move your piece to row: #{row} and column: #{column}: that is #{legal_move_to} "
     move_towards
   end 
+  
+  def is_current_player_in_check
+    if self.turn == "WHITE" && player_one[2] == true
+      return true
+    elsif self.turn == "WHITE" && player_one[2] == false
+      return false  
+    end 
+
+    if self.turn == "BLACK" && player_two[2] == true
+      return true
+    else
+      return false  
+    end 
+  end  
 
   def move_piece(start,finish)
     from    = convert_user_input(start)
@@ -136,12 +150,21 @@ class Chess_game
     piece   = board[from[0]][from[1]]
     other_piece = board[towards[0]][towards[1]]
 
-    # p find_other_players_king
+
+
+    if is_current_player_in_check 
+      puts "current team -> #{self.turn} IS in check"
+    elsif is_current_player_in_check == false
+      puts "current team -> #{self.turn} NOT in check"
+      # CHECk with current piece?
     if check_possible_move_for(piece,towards,['inv','inv']).include?(find_other_players_king[1])
-      puts "testing -- found king!"
-      self.check = true
-    else 
-      self.check = false  
+      if turn == "WHITE"
+          player_two[2] = true
+        end 
+
+        if turn == "BLACK"
+          player_one[2] = true
+        end     
     end 
 
     #puts '---- testing possible moves 1 (inside #move_piece) ----'
@@ -157,9 +180,11 @@ class Chess_game
         self.player_two[1] << other_piece
       end
 
-      #Check if move put other player in check
+      
       board[from[0]][from[1]] = '-'
       board[towards[0]][towards[1]] = piece
+
+      #Check if move put other player in check
       future_moves = []
 
       find_all_current_players_pieces.each do |item|
@@ -171,10 +196,16 @@ class Chess_game
       end 
       
       if future_moves.flatten!(1).include?(find_other_players_king[1])
-        self.check = true
+        # self.check = true
+        if turn == "WHITE"
+          player_two[2] = true
+        end 
+
+        if turn == "BLACK"
+          player_one[2] = true
+        end   
       end 
       return true 
-
     else
       puts ''
       puts ''
@@ -182,6 +213,66 @@ class Chess_game
       puts "re-enter coordinates"
       return false  
     end  
+    end  
+          
+
+    # # CHECk with current piece?
+    # if check_possible_move_for(piece,towards,['inv','inv']).include?(find_other_players_king[1])
+    #   if turn == "WHITE"
+    #       player_two[2] = true
+    #     end 
+
+    #     if turn == "BLACK"
+    #       player_one[2] = true
+    #     end     
+    # end 
+
+    # #puts '---- testing possible moves 1 (inside #move_piece) ----'
+    # if check_possible_move_for(piece,from,towards).include?(towards)
+    #   #puts "TEST 3 - after #checking_for_possible moves -"
+    #   #                       |
+    #   #CAPTURE MECHANISM HERE v
+    #   if other_piece != '-' && self.turn == "WHITE"
+    #     self.player_one[1] << other_piece
+    #   end
+
+    #   if other_piece != '-' && self.turn == "BLACK"
+    #     self.player_two[1] << other_piece
+    #   end
+
+      
+    #   board[from[0]][from[1]] = '-'
+    #   board[towards[0]][towards[1]] = piece
+
+    #   #Check if move put other player in check
+    #   future_moves = []
+
+    #   find_all_current_players_pieces.each do |item|
+    #     if item != [piece,from]
+    #       if check_possible_move_for(item[0],item[1],['inv','inv']) != []
+    #         future_moves << check_possible_move_for(item[0],item[1],['inv','inv'])
+    #       end 
+    #     end  
+    #   end 
+      
+    #   if future_moves.flatten!(1).include?(find_other_players_king[1])
+    #     # self.check = true
+    #     if turn == "WHITE"
+    #       player_two[2] = true
+    #     end 
+
+    #     if turn == "BLACK"
+    #       player_one[2] = true
+    #     end   
+    #   end 
+    #   return true 
+    # else
+    #   puts ''
+    #   puts ''
+    #   puts "ERROR:: ILLEGAL MOVE"
+    #   puts "re-enter coordinates"
+    #   return false  
+    # end  
   end 
 
   def find_all_current_players_pieces
@@ -254,7 +345,7 @@ class Chess_game
           i += 1
         end
     end
-    puts "INSIDE other players king function --> #{other_king}"        
+    #puts "INSIDE other players king function --> #{other_king}"        
     return other_king           
   end  
 
