@@ -16,10 +16,21 @@ class Chess_game
         ['-','-','-','-','-','-','-','-'],
         ['-','-','-','♚','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','-','-','-','-','-'],
-        ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
-        ['♜','♞','♝','♛','-','♝','♞','♜']  #white
+        ['-','-','-','-','-','-','♜','-'],
+        ['-','-','-','-','-','-','-','♜'], #white
+        ['-','-','-','♔','-','-','-','-']  #white
       ]
+
+      # [
+      #   ['♖','♘','♙','♕','♔','♗','♘','♖'], #black
+      #   ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
+      #   ['-','-','-','-','-','-','-','-'],
+      #   ['-','-','-','♚','-','-','-','-'],
+      #   ['-','-','-','-','-','-','-','-'],
+      #   ['-','-','-','-','-','-','-','-'],
+      #   ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
+      #   ['♜','♞','♝','♛','-','♝','♞','♜']  #white
+      # ]
 	end	
 
 	def print_board
@@ -203,7 +214,7 @@ class Chess_game
       other_players_moves << opp_pawn_move  
       other_players_moves.flatten!(1)
       other_players_moves.uniq!
-     #1e. CHECK IS KING WILL BE IN CHECK still 
+     #1e. CHECK IF KING WILL BE IN CHECK still 
       if other_players_moves.include?(find_current_players_king[1]) == false
         player_two[2] = false
         puts "king not in check!"
@@ -263,11 +274,7 @@ class Chess_game
       end  
     end #(END OF WHITE)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      #1a. UNTIL player is NOT in CHECK
-      while is_current_player_in_check == true
-        if check_possible_move_for(piece,from,towards).include?(towards)
-        end  
-      end  
+      
 
     elsif is_current_player_in_check == false
       puts "current player is not in check"
