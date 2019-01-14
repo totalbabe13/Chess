@@ -11,11 +11,11 @@ class Chess_game
       @check = false
       @check_mate = false
       @board = [
-        ['♖','♘','♗','♕','♔','♗','♘','-'], #black
+        ['♖','♘','♗','♕','♔','♗','♘','♖'], #black
         ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
         ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','♙','-','-','-','-'],
-        ['-','-','-','♟','-','-','-','-'],
+        ['-','-','-','-','-','-','-','-'],
+        ['-','-','-','-','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
         ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
         ['♜','♞','♝','♛','♚','♝','♞','♜']  #white
@@ -126,7 +126,7 @@ class Chess_game
           end 
        end 
     end
-    puts "You want to move your #{player_input} that is located at row: #{row} and column: #{column} "
+    puts "SELECTED PIECE #{player_input} -->  #{row},#{column} "
     return from 
   end 
 
@@ -163,14 +163,12 @@ class Chess_game
     piece   = board[from[0]][from[1]]
     other_piece = board[towards[0]][towards[1]]
 
-    find_attacking_pieces_paths
-
-    # 1. Ask if player is in CHECK? if yes --> proceed through normal move mechanism  
-    # if is_current_player_in_check == false
-
+    
+    # 1. Ask if player is in CHECK? if FALSE --> proceed through normal move mechanism  
     if is_current_player_in_check == true
+      #MAKE SURE MOVE IS LEGAL
       if check_possible_move_for(piece,from,towards).include?(towards)
-        puts "current player is in check"
+        puts "- - current player is in check(line 177) - -"
         #1a. UPDATE the board temporarily 
         board[from[0]][from[1]] = '-'
         board[towards[0]][towards[1]] = piece
@@ -179,7 +177,6 @@ class Chess_game
         opposite_pawns = []
         opp_pawn_move = []
         attacking_pieces = []
-      
       #- - - - FOR BLACK - - - - - - - 
         if self.turn == "BLACK" 
           #1c. Mapping pawn captures
@@ -200,47 +197,40 @@ class Chess_game
               end   
             end
           end
-        opp_pawn_move.uniq!
-     # puts "opposite pawns moves --> #{opp_pawn_move}" #WORKS!
-      
-      #1d. REMOVE PAWNS from all pieces // Map othe pieces captures
-      find_all_opposite_players_pieces.each do |item|
-        if item[0] != '♟'
-          if check_possible_move_for(item[0],item[1],['inv','inv']) != []
-             other_players_moves << check_possible_move_for(item[0],item[1],['inv','inv'])
-          end 
-        end  
-      end
-      other_players_moves << opp_pawn_move  
-      other_players_moves.flatten!(1)
-      other_players_moves.uniq!
-     #1e. CHECK IF KING WILL BE IN CHECK still 
-      if other_players_moves.include?(find_current_players_king[1]) == false
-        player_two[2] = false
-        puts "king not in check!"
-        return true
-     #1f. Checkmate?    
-      #elsif other_players_moves.include?(find_current_players_king[1]) == true
-        #FIND ATTACKING PIECES
-        #MAP thier location and movement
-            
-      else 
-        board[from[0]][from[1]] = piece  
-        board[towards[0]][towards[1]] = other_piece 
-        puts "ILLEGAL MOVE!! CANNOT MOVE KING INTO CHECK!"
-        return false 
-      end  
-    end #(end of BLACK // CHECK)
-
+          opp_pawn_move.uniq!
+          #1d. REMOVE PAWNS from all pieces // Map othe pieces captures
+          find_all_opposite_players_pieces.each do |item|
+            if item[0] != '♟'
+              if check_possible_move_for(item[0],item[1],['inv','inv']) != []
+                other_players_moves << check_possible_move_for(item[0],item[1],['inv','inv'])
+              end 
+            end  
+          end
+          other_players_moves << opp_pawn_move  
+          other_players_moves.flatten!(1)
+          other_players_moves.uniq!
+          #1e. CHECK IF KING WILL BE IN CHECK still 
+          if other_players_moves.include?(find_current_players_king[1]) == false
+            player_two[2] = false
+            puts "king not in check!"
+            return true
+          #1f. Checkmate?        
+          else 
+            board[from[0]][from[1]] = piece  
+            board[towards[0]][towards[1]] = other_piece 
+            puts "ILLEGAL MOVE!! CANNOT MOVE KING INTO CHECK!"
+            return false 
+          end  
+        end #(end of BLACK // CHECK)
     # - - - -FOR WHITE - - - - - - - - 
-    if self.turn == "WHITE"
-      #1c. Mapping pawn captures
-      find_all_opposite_players_pieces.each do |item|
+        if self.turn == "WHITE"
+        #1c. Mapping pawn captures
+        find_all_opposite_players_pieces.each do |item|
         if item[0] == '♙'
           opposite_pawns << item[1]
         end  
-      end  
-      opposite_pawns.each do |pawn|  
+        end  
+        opposite_pawns.each do |pawn|  
           if pawn[0] < 7 && pawn[1] < 7  
             if board[pawn[1][0] + 1][pawn[1][1] + 1] == '-' 
                opp_pawn_move << [pawn[0] + 1, pawn[1] + 1]
@@ -251,74 +241,70 @@ class Chess_game
                opp_pawn_move << [pawn[0] + 1, pawn[1] - 1]
             end   
           end
-      end
-      opp_pawn_move.uniq!
-      #1d. REMOVE PAWNS from all pieces // Map othe pieces captures
-      find_all_opposite_players_pieces.each do |item|
+        end
+        opp_pawn_move.uniq!
+        #1d. REMOVE PAWNS from all pieces // Map othe pieces captures
+        find_all_opposite_players_pieces.each do |item|
         if item[0] != '♙'
           if check_possible_move_for(item[0],item[1],['inv','inv']) != []
              other_players_moves << check_possible_move_for(item[0],item[1],['inv','inv'])
           end 
         end  
-      end
-      other_players_moves << opp_pawn_move  
-      other_players_moves.flatten!(1)
-      other_players_moves.uniq!
-     #1e. CHECK IS KING WILL BE IN CHECK still 
-      if other_players_moves.include?(find_current_players_king[1]) == false
+        end
+        other_players_moves << opp_pawn_move  
+        other_players_moves.flatten!(1)
+        other_players_moves.uniq!
+       #1e. CHECK IS KING WILL BE IN CHECK still 
+        if other_players_moves.include?(find_current_players_king[1]) == false
         player_two[2] = false
-        puts "king not in check!"
+        puts "king not in check!(line 274)"
         return true
-      else 
+        else 
         board[from[0]][from[1]] = piece  
         board[towards[0]][towards[1]] = other_piece 
-        puts "ILLEGAL MOVE!! CANNOT MOVE KING INTO CHECK!"
+        puts "ILLEGAL MOVE!! CANNOT MOVE KING INTO CHECK! (line 279)"
         return false 
-      end  
-    end #(END OF WHITE)
-  else
-    puts "ILLEGAL MOVE 1"
-    return false
-  end   #(END of legal move IF)  
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      
-
+        end  
+        end #(END OF WHITE)
+      else
+        puts "ILLEGAL MOVE 1 (line 280)"
+        return false
+      end   #(END of legal move IF (from line 170))  
+    # - NOT IN CHECK -
     elsif is_current_player_in_check == false
-      puts "current player is not in check"
-
-     # 2. Ask if current player can legally move to thier selected destination
-    if check_possible_move_for(piece,from,towards).include?(towards)
+      puts "current player is not in check (line288)"
+      p check_possible_move_for(piece,from,towards)
+      puts"____________________"
       
-      # 3. Ask if Current player's selected piece going to put other player's King into check?
-      if check_possible_move_for(piece,towards,['inv','inv']).include?(find_other_players_king[1])
-        if turn == "WHITE"
-          player_two[2] = true
-        end 
-
-        if turn == "BLACK"
-          player_one[2] = true
-        end     
-      end 
-                               
-      #4. CAPTURE MECHANISM HERE v
-      if other_piece != '-' && self.turn == "WHITE"
-        self.player_one[1] << other_piece
-      end
-
-      if other_piece != '-' && self.turn == "BLACK"
-        self.player_two[1] << other_piece
-      end
-
-      #5. UPDATE the board // MOVE the piece
-      board[from[0]][from[1]] = '-'
-      board[towards[0]][towards[1]] = piece
-
-      #6. Ask if current players move will open any other pieces to put other player in check
-      future_moves = []
-          #6a. Make map of current players pieces, and thier future captures
-      find_all_current_players_pieces.each do |item|
-        if item != [piece,from]
+      # 2. Ask if current player can legally move to thier selected destination
+      if check_possible_move_for(piece,from,towards).include?(towards)
+        # 3. Ask if Current player's selected piece going to put other player's King into check?
+        if check_possible_move_for(piece,towards,['inv','inv']).include?(find_other_players_king[1])
+          if turn == "WHITE"
+            player_two[2] = true
+          end 
+          if turn == "BLACK"
+            player_one[2] = true
+          end     
+        end                         
+        #4. CAPTURE MECHANISM HERE v
+        if other_piece != '-' && self.turn == "WHITE"
+          self.player_one[1] << other_piece
+        end
+        if other_piece != '-' && self.turn == "BLACK"
+          self.player_two[1] << other_piece
+        end
+        #5. UPDATE the board // MOVE the piece
+        board[from[0]][from[1]] = '-'
+        board[towards[0]][towards[1]] = piece
+        #6. Ask if current player's move will open any other pieces to put other player in check
+        future_moves = []
+        #6a. Make map of current players pieces, and thier future captures
+        find_all_current_players_pieces.each do |item|
+          if item != [piece,from]
+            puts "(line 322)"
           if check_possible_move_for(item[0],item[1],['inv','inv']) != []
+            puts "line (324)"
             future_moves << check_possible_move_for(item[0],item[1],['inv','inv'])
           end 
         end  
@@ -339,11 +325,11 @@ class Chess_game
      else
         puts ''
         puts ''
-        puts "ERROR:: ILLEGAL MOVE"
+        puts "ERROR 2:: ILLEGAL MOVE(line 346)"
         puts "re-enter coordinates"
         return false  
      end   
-    end #if player not in check (end for step #1)
+    end #i(end for step #1 (line 168))
   end 
 
   def other_players_pawns
@@ -449,16 +435,15 @@ class Chess_game
     current_paths = []
     attack_paths  = []
 
-    #CAN KING MOVE AWAY? 
-    # king_cannot_move = false
-    
+    #1. CAN KING MOVE AWAY? 
+    king_cannot_move = false
+    if king_moves == []
+      king_cannot_move = true
+      puts "king cannot move away"
+    end  
+    # - - - - - - - - - - - - - - - - - - - - -
 
-    # if king_moves == []
-    #   king_cannot_move = true
-    #   puts "king cannot move away"
-    # end  
-
-    #MAP OF POTENTIAL DEFENING PATHS
+    #2. MAP OF POTENTIAL DEFENING PATHS
     # king_cannot_be_defended = false
     # current_pieces.each do |item|
     #   if check_possible_move_for(item[0],item[1],['inv','inv']) != []
@@ -466,13 +451,13 @@ class Chess_game
     #   end
     # end  
 
-    #MAP OF ATTACKING PATHS
-    opp_pieces.each do |item|
-      if check_possible_move_for(item[0],item[1],['inv','inv']) != []
-        attack_paths << check_possible_move_for(item[0],item[1],['inv','inv'])
-      end
-    end
-    attack_paths.each {|path| p path}
+    #3. MAP OF ATTACKING PATHS
+    # opp_pieces.each do |item|
+    #   if check_possible_move_for(item[0],item[1],['inv','inv']) != []
+    #     attack_paths << check_possible_move_for(item[0],item[1],['inv','inv'])
+    #   end
+    # end
+    # attack_paths.each {|path| p path}
 
 
 
@@ -484,7 +469,7 @@ class Chess_game
     current_player_pieces = []
     
     if self.turn == "WHITE"
-      white_pieces = ['♜','♞','♝','♛','♟','♚']
+      white_pieces = ['♜','♞','♝','♛','♚','♟']
       i = 0
         while i < 8
           j = 0 
@@ -666,10 +651,10 @@ class Chess_game
     x = x.to_i
     x = x-1
     if x > 8
-     puts 'INVALID ENTRY' 
+     puts 'INVALID ENTRY (line 669)' 
      return false
     elsif x < 0 
-     puts 'INVALID ENTRY'
+     puts 'INVALID ENTRY (line 672)'
      return false
     end
     
@@ -722,10 +707,10 @@ class Chess_game
     x_to = destination[0].to_i
     y_to = destination[1].to_i
     value_of_destination_cell = board[x_to][y_to]
-    
     case piece 
   # - - - - - - - WHITE PAWN - - - - - - - -     
       when "♟"
+        
         can_move  = []#[[x-1,y]]
         capture   = [[x-1,y-1],[x-1,y+1]]
         capturing = [board[x-1][y-1],board[x-1][y+1]]
@@ -745,11 +730,7 @@ class Chess_game
           can_move << capture[1]  
         end  
 
-        if can_move.empty?
-          # puts "NO LEGAL MOVES"
-        end  
-
-        # puts "list of possible moves -->#{can_move}"
+         #puts "list of possible moves -->#{can_move}"
         return can_move
   # - - - - - - - WHITE PAWN - - - - - - - -
   # - - - - - - - BLACK PAWN - - - - - - - -
