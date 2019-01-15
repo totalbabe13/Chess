@@ -162,7 +162,8 @@ class Chess_game
     towards = convert_user_input(finish)
     piece   = board[from[0]][from[1]]
     other_piece = board[towards[0]][towards[1]]
-
+    
+    find_attacking_pieces_paths
     
     # 1. Ask if player is in CHECK? if FALSE --> proceed through normal move mechanism  
     if is_current_player_in_check == true
@@ -273,7 +274,6 @@ class Chess_game
     # - NOT IN CHECK -
     elsif is_current_player_in_check == false
       puts "current player is not in check (line288)"
-      p check_possible_move_for(piece,from,towards)
       puts"____________________"
       
       # 2. Ask if current player can legally move to thier selected destination
@@ -302,15 +302,15 @@ class Chess_game
         #6a. Make map of current players pieces, and thier future captures
         find_all_current_players_pieces.each do |item|
           if item != [piece,from]
-            puts "(line 322)"
-          if check_possible_move_for(item[0],item[1],['inv','inv']) != []
-            puts "line (324)"
-            future_moves << check_possible_move_for(item[0],item[1],['inv','inv'])
-          end 
-        end  
-      end 
+            #puts "(line 322)"
+            if check_possible_move_for(item[0],item[1],['inv','inv']) != []
+              #puts "line (324)"
+              future_moves << check_possible_move_for(item[0],item[1],['inv','inv'])
+            end 
+          end  
+        end 
         #6b. Ask if other player's King position is with in range of any of current player's move matrix
-      if future_moves.flatten!(1).include?(find_other_players_king[1])
+        if future_moves.flatten!(1).include?(find_other_players_king[1])
           if turn == "WHITE"
             player_two[2] = true
           end 
@@ -318,9 +318,9 @@ class Chess_game
           if turn == "BLACK"
             player_one[2] = true
           end   
-      end #(end for step #2)
-      #7. return true to #PRINT BOARD, to update the board
-      return true 
+        end #(end for step #2)
+        #7. return true to #PRINT BOARD, to update the board
+        return true 
        
      else
         puts ''
@@ -433,37 +433,95 @@ class Chess_game
     current_pieces = find_all_current_players_pieces
     opp_pieces = find_all_opposite_players_pieces
     current_paths = []
+    opp_paths     = []
     attack_paths  = []
+    king_space = spaces_around_king
 
-    #1. CAN KING MOVE AWAY? 
-    king_cannot_move = false
-    if king_moves == []
-      king_cannot_move = true
-      puts "king cannot move away"
+    puts ''
+    puts ''
+    puts "- - inside of #find_attacking_pieces_paths - -"
+    puts "king #{king}"
+    puts "king_moves #{king_moves}"
+    
+
+    if self.turn == "WHITE"
+      puts "current playeris WHITE"
     end  
-    # - - - - - - - - - - - - - - - - - - - - -
 
-    #2. MAP OF POTENTIAL DEFENING PATHS
-    # king_cannot_be_defended = false
+    if self.turn == "BLACK"
+      puts "current playeris BLACK"
+    end  
+
+    # #1. CAN KING MOVE AWAY? 
+    # king_cannot_move = false
+    # if king_moves == []
+    #   king_cannot_move = true
+    #   puts "king cannot move away"
+    # end  
+    # # - - - - - - - - - - - - - - - - - - - - -
+
+    # # 2. MAP OF POTENTIAL DEFENING PATHS
+    # king_defended = false
     # current_pieces.each do |item|
     #   if check_possible_move_for(item[0],item[1],['inv','inv']) != []
     #     current_paths << check_possible_move_for(item[0],item[1],['inv','inv'])
     #   end
     # end  
 
-    #3. MAP OF ATTACKING PATHS
-    # opp_pieces.each do |item|
-    #   if check_possible_move_for(item[0],item[1],['inv','inv']) != []
-    #     attack_paths << check_possible_move_for(item[0],item[1],['inv','inv'])
-    #   end
-    # end
-    # attack_paths.each {|path| p path}
-
-
-
+    # 3. MAP OF OPPOSING PATHS w/ pieces AND locations!
+    opp_pieces.each do |item|
+      if check_possible_move_for(item[0],item[1],['inv','inv']) != []
+        opp_paths << [item, check_possible_move_for(item[0],item[1],['inv','inv'])]
+      end
+    end
     
+
+    # 4. CHECK if opposing paths ATTACK the king
+    opp_paths.each do |path| 
+      if path[1].include?(king[1])
+        x = path[1] & king_space
+        p x
+        # if x != []
+        #   attack = [ create_linear_path(king[1], x), path[0][1]]
+        #   attack_paths << attack #[["♛", [3, 7]], [[1, 5], [2, 6]]]
+        # end  
+      end      
+    end
+    puts "attack paths --> #{attack_paths}"
     
-  end   
+    puts "- - end of #find_attacking_pieces_paths - -"
+    puts ''
+    puts '' 
+  end 
+
+  def spaces_around_king
+    king = find_current_players_king[1] #[x,y-1],[x+1,y-1],[x+1,y],[x+1,y+1],[x,y+1],[x-1,y+1],[x-1,y],[x-1,y-1]]
+    x = king[0]
+    y = king[1]
+    spaces = [[x,y-1],[x+1,y-1],[x+1,y],[x+1,y+1],[x,y+1],[x-1,y+1],[x-1,y],[x-1,y-1]]
+    spaces.delete_if{|space| space[0] > 7}
+    spaces.delete_if{|space| space[0] < 0}
+    spaces.delete_if{|space| space[1] > 7}
+    spaces.delete_if{|space| space[1] < 0}
+    spaces.delete_if{|space| board[space[0]][space[1]] != '-'}
+    return spaces
+    # king => [x,y] 
+  end  
+
+  def create_linear_path(from,away)
+    x = (away[0] - from[0])
+    y = (away[1] - from[1])
+    path = []
+    space = board[from[0]+x][from[1]+y]
+    next_move = [from[0]+x,from[1]+y]
+  
+    while space == '-'
+      path << next_move
+      next_move = [next_move[0]+x,next_move[1]+y]
+      space = board[next_move[0]][next_move[1]]
+    end
+    return path   
+  end  
 
   def find_all_current_players_pieces
     current_player_pieces = []
