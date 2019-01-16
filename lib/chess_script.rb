@@ -25,11 +25,17 @@ include Ui_messages
  	     player_two = gets.chomp
        new_game = Chess_game.new(player_one,player_two)
  	   
- 	   while new_game.check_mate == false   
+ 	   while new_game.check_mate == false 
+ 	   	new_game.look_for_check_mate
+ 	    
+ 	    puts "test 6 #{new_game.check_mate}"  
         new_game.print_board
-        #new_game.find_other_players_king
-        new_game.change_player
         
+        puts "test 5 #{new_game.check_mate}"
+      
+        new_game.change_player
+        new_game.look_for_check_mate
+      
        end 
        puts " -G-A-M-E-   -O-V-E-R-"
        # new_game.player_input_coordinates(5,'d')

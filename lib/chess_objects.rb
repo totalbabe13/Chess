@@ -7,18 +7,18 @@ class Chess_game
 	def initialize(p1,p2)
 	    @player_one = [p1,[],false] #white
       @player_two = [p2,[],false] #black
-      @turn       = "WHITE" # "BLACK" or "WHITE"
+      @turn       = "BLACK" # "BLACK" or "WHITE"
       @check = false
       @check_mate = false
       @board = [
-        ['-','-','-','♕','♖','♔','-','-'], #black
-        ['-','♜','-','-','-','-','♜','♙'], #black
-        ['♙','-','-','♖','-','-','-','♝'],
-        ['-','-','♙','-','-','-','-','-'],
-        ['-','-','-','-','♟','-','-','-'],
-        ['-','-','-','-','-','-','♟','-'],
-        ['♗','-','-','-','-','-','♚','♟'], #white
-        ['-','-','-','-','-','-','-','-']  #white
+        ['-','♔','-','-','-','-','-','-'], #black
+        ['-','-','-','-','-','-','-','-'], #black
+        ['♝','♚','-','-','-','♞','-','-'],
+        ['-','-','-','-','-','-','-','-'],
+        ['-','-','-','-','-','-','-','-'],
+        ['-','-','-','-','-','-','-','-'],
+        ['-','-','-','-','-','-','-','-'], #white
+        ['-','-','-','-','-','♘','-','-']  #white
       ]
 
       # [
@@ -68,6 +68,7 @@ class Chess_game
     puts "It is now the #{turn} team's turn --> #{player[0]} ITS YOUR MOVE!"
     puts ''
     puts ''
+    puts "CHECK MATE? #{self.check_mate}"
     puts "PLAYER TWO: #{player_two[0]} -- Captured pieces : #{player_two[1]} -- IN CHECK?-> #{player_two[2].to_s}"
     puts ''
     puts "     A   B   C   D   E   F   G   H"
@@ -162,8 +163,6 @@ class Chess_game
     towards = convert_user_input(finish)
     piece   = board[from[0]][from[1]]
     other_piece = board[towards[0]][towards[1]]
-    
-    find_attacking_pieces_paths
     
     # 1. Ask if player is in CHECK? if FALSE --> proceed through normal move mechanism  
     if is_current_player_in_check == true
@@ -422,10 +421,9 @@ class Chess_game
       return captures  
     end
     # current_pawn_locations
-    
   end  
 
-  def find_attacking_pieces_paths
+  def look_for_check_mate
     #position and possible moves for king before board updates move
 
     king = find_current_players_king
@@ -436,13 +434,15 @@ class Chess_game
     opp_paths     = []
     attack_paths  = []
     king_space = spaces_around_king
-    defend_paths = []
     king_cannot_move = false
     king_cannot_defend = false
     puts "- - inside of #find_attacking_pieces_paths - -"
+    puts "who's turn? ->#{turn}"
+    puts "king #{king} moves #{king_moves }"
 
     #1. CAN KING MOVE AWAY? 
     if king_moves == []
+      puts "test 3"
       king_cannot_move = true
     end  
     
@@ -457,36 +457,49 @@ class Chess_game
     # 3. MAP OF OPPOSING PATHS w/ pieces AND locations!
     opp_pieces.each do |item|
       if check_possible_move_for(item[0],item[1],['inv','inv']) != []
+        # if item[0] != "♘" || item[0] != "♞"
         opp_paths << [item, check_possible_move_for(item[0],item[1],['inv','inv'])]
       end
     end
     
     # 4. CHECK if opposing paths ATTACK the king
     opp_paths.each do |path|
-      p path  
       if path[1].include?(king[1])
-        x = path[1] & king_space
-        x.flatten!(1) 
-        if x != []
-          attack = create_linear_path(king[1],x)
-          attack.push(path[0][1])
-          attack_paths << attack 
-        end  
+        if path[0][0] == "♘" ||  path[0][0] == "♞"
+          attack_paths.push(path[0][1])
+        elsif  path[0][0] != "♘" ||  path[0][0] != "♞"           
+          x = path[1] & king_space
+          x.flatten!(1) 
+          if x != []
+            attack = create_linear_path(king[1],x)
+            attack.push(path[0][1])
+            attack_paths << attack 
+          end 
+        end   
       end      
     end
     attack_paths.flatten!(1)
+
     #attack paths -->[[3, 7],[1, 5],[2, 6]]
     
-    #CHECK if player can defend against attack(from queens/rooks/bishops)
-    current_paths.each do |path| 
+    # 5.CHECK if player can defend against attack(from queens/rooks/bishops)
+    current_paths.each do |path|
+      defend_paths = [] 
       defends = path & attack_paths
       if defends != []
+        puts "test 1"
         defend_paths.push(defends) 
+      end
+      if defend_paths.empty?
+        puts "test 2"
+        king_cannot_defend = true
       end  
     end
 
-    if defend_paths.length == 0
+    if king_cannot_defend && king_cannot_move
+      puts "test 4"
       self.check_mate = true
+      #return true
     end  
 
     puts "- - end of #find_attacking_pieces_paths - -"
