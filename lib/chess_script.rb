@@ -31,6 +31,7 @@ include Ui_messages
         new_game.change_player
         
        end 
+       puts " -G-A-M-E-   -O-V-E-R-"
        # new_game.player_input_coordinates(5,'d')
 
 

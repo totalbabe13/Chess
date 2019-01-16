@@ -11,14 +11,14 @@ class Chess_game
       @check = false
       @check_mate = false
       @board = [
-        ['♖','♘','♗','♕','♔','♗','♘','♖'], #black
-        ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
-        ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','-','-','-','-','-'],
-        ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
-        ['♜','♞','♝','♛','♚','♝','♞','♜']  #white
+        ['-','-','-','♕','♖','♔','-','-'], #black
+        ['-','♜','-','-','-','-','♜','♙'], #black
+        ['♙','-','-','♖','-','-','-','♝'],
+        ['-','-','♙','-','-','-','-','-'],
+        ['-','-','-','-','♟','-','-','-'],
+        ['-','-','-','-','-','-','♟','-'],
+        ['♗','-','-','-','-','-','♚','♟'], #white
+        ['-','-','-','-','-','-','-','-']  #white
       ]
 
       # [
@@ -436,37 +436,23 @@ class Chess_game
     opp_paths     = []
     attack_paths  = []
     king_space = spaces_around_king
-
-    puts ''
-    puts ''
+    defend_paths = []
+    king_cannot_move = false
+    king_cannot_defend = false
     puts "- - inside of #find_attacking_pieces_paths - -"
-    puts "king #{king}"
-    puts "king_moves #{king_moves}"
+
+    #1. CAN KING MOVE AWAY? 
+    if king_moves == []
+      king_cannot_move = true
+    end  
     
-
-    if self.turn == "WHITE"
-      puts "current playeris WHITE"
+    # 1a. CAN KING DEFEND?
+    # 2. MAP OF POTENTIAL DEFENING PATHS
+    current_pieces.each do |item|
+      if check_possible_move_for(item[0],item[1],['inv','inv']) != []
+        current_paths << check_possible_move_for(item[0],item[1],['inv','inv'])
+      end
     end  
-
-    if self.turn == "BLACK"
-      puts "current playeris BLACK"
-    end  
-
-    # #1. CAN KING MOVE AWAY? 
-    # king_cannot_move = false
-    # if king_moves == []
-    #   king_cannot_move = true
-    #   puts "king cannot move away"
-    # end  
-    # # - - - - - - - - - - - - - - - - - - - - -
-
-    # # 2. MAP OF POTENTIAL DEFENING PATHS
-    # king_defended = false
-    # current_pieces.each do |item|
-    #   if check_possible_move_for(item[0],item[1],['inv','inv']) != []
-    #     current_paths << check_possible_move_for(item[0],item[1],['inv','inv'])
-    #   end
-    # end  
 
     # 3. MAP OF OPPOSING PATHS w/ pieces AND locations!
     opp_pieces.each do |item|
@@ -475,20 +461,34 @@ class Chess_game
       end
     end
     
-
     # 4. CHECK if opposing paths ATTACK the king
-    opp_paths.each do |path| 
+    opp_paths.each do |path|
+      p path  
       if path[1].include?(king[1])
         x = path[1] & king_space
-        p x
-        # if x != []
-        #   attack = [ create_linear_path(king[1], x), path[0][1]]
-        #   attack_paths << attack #[["♛", [3, 7]], [[1, 5], [2, 6]]]
-        # end  
+        x.flatten!(1) 
+        if x != []
+          attack = create_linear_path(king[1],x)
+          attack.push(path[0][1])
+          attack_paths << attack 
+        end  
       end      
     end
-    puts "attack paths --> #{attack_paths}"
+    attack_paths.flatten!(1)
+    #attack paths -->[[3, 7],[1, 5],[2, 6]]
     
+    #CHECK if player can defend against attack(from queens/rooks/bishops)
+    current_paths.each do |path| 
+      defends = path & attack_paths
+      if defends != []
+        defend_paths.push(defends) 
+      end  
+    end
+
+    if defend_paths.length == 0
+      self.check_mate = true
+    end  
+
     puts "- - end of #find_attacking_pieces_paths - -"
     puts ''
     puts '' 
