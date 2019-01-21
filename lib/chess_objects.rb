@@ -20,7 +20,7 @@ class Chess_game
         ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
         ['♜','♞','♝','♚','♛','♝','♞','♜']  #white
       ] 
-      #[
+      
       #   ['-','♔','-','-','-','-','-','-'], #black
       #   ['-','-','-','-','-','-','-','-'], #black
       #   ['♝','♚','-','-','-','♞','-','-'],
@@ -458,14 +458,26 @@ class Chess_game
     king_cannot_move   = false
     king_cannot_defend = false
     king_under_attack  = false
+    illegal = [king_future_capture]    
 
     #1. CAN KING MOVE AWAY?
+    puts "illegal #{illegal}" 
+    if king_future_capture != []
+      king_moves.delete_if do |move|
+        illegal.include?(move)
+      end 
+    end   
     puts "king_moves #{king_moves}"
     puts "future captures #{king_future_capture}"
-    if king_future_capture == king_moves
+    if king_moves.empty?
       king_cannot_move = true
-      puts "test 1: KING CANNOT MOVE AWAY? #{king_cannot_move}" 
+      puts "test 1: KING CANNOT MOVE AWAY? #{king_cannot_move}"
     end  
+          
+    # if king_future_capture == king_moves
+    #   king_cannot_move = true
+    #   puts "test 1: KING CANNOT MOVE AWAY? #{king_cannot_move}" 
+    # end  
     
     # 1a. CAN KING DEFEND?
 
@@ -538,12 +550,13 @@ class Chess_game
   end 
 
   def king_future_capture
-    puts "FUTUTRE KING CAPTURES FUNCTION"
+    # puts "FUTUTRE KING CAPTURES FUNCTION"
     # #GOAL: find if potential moves for king are legal?
     # 1. Find King, and list Moves, 
     king = find_current_players_king
     king_moves = check_possible_move_for(king[0],king[1],['inv','inv'])
-
+    copy_board = Marshal.load( Marshal.dump(board) )
+    # p board
     # - variable created to reset board to its original state 
     original_king_position = king[1]
     king_image = king[0]
@@ -576,9 +589,15 @@ class Chess_game
          i += 1               
       end  
     end 
-    #set board back to original state  
-    board[original_king_position[0]][ original_king_position[1]] = king_image     
-    illegal_moves.flatten!(1)
+    #set board back to original state 
+    self.board = copy_board
+    #board[original_king_position[0]][ original_king_position[1]] = king_image     
+   
+    if illegal_moves.flatten!(1) == nil
+      return []
+    else
+      return   illegal_moves.flatten!(1)
+    end  
   end
 
   def opp_team_captures
@@ -837,7 +856,7 @@ class Chess_game
       when 'h' || 'H'
        y = 7 
       else
-       puts "Error: INVALID entry"
+       puts "Error: INVALID entry (858)"
        return false
     end
     piece = board[x][y]

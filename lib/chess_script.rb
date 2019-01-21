@@ -20,19 +20,19 @@ include Ui_messages
 
  	if user_response_2 == '1'
  	   new_game_player1
- 	     player_one = gets.chomp
+ 	    player_one = gets.chomp
  	   new_game_player2
- 	     player_two = gets.chomp
+ 	    player_two = gets.chomp
        new_game = Chess_game.new(player_one,player_two)
  	   
  	   while new_game.check_mate == false 
  	   	new_game.look_for_check_mate
         new_game.print_board
         new_game.change_player
-        #new_game.look_for_check_mate
+        new_game.look_for_check_mate
        end 
        puts " -G-A-M-E-   -O-V-E-R-"
-       p new_game.turn
+       puts "#{new_game.turn} LOSES"
       
 
 
