@@ -1,4 +1,5 @@
 # require_relative('user_interface')
+require "pry"
 
 class Chess_game
   # include Ui_messages
@@ -14,10 +15,10 @@ class Chess_game
         ['♖','♘','♗','♔','♕','♗','♘','♖'], #black
         ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
         ['-','-','-','-','-','-','-','-'],
+        ['-','-','-','-','♔','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
         ['-','-','-','-','-','-','-','-'],
-        ['-','-','-','-','-','-','-','-'],
-        ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
+        ['♟','♟','♟','♟','-','♟','♟','♟'], #white
         ['♜','♞','♝','♚','♛','♝','♞','♜']  #white
       ] 
       
@@ -300,6 +301,8 @@ class Chess_game
       if check_possible_move_for(piece,from,towards).include?(towards)
         if piece == "♔" || piece == "♚"
           king_future_capture.include?(towards)
+          puts "king_future_capture #{king_future_capture}"
+          puts "#{piece} -> moves #{check_possible_move_for(piece,from,towards)}"
           puts "ERROR: cannot capture into check! (303)"
           return false
         end  
@@ -450,82 +453,92 @@ class Chess_game
   end  
 
   def look_for_check_mate
-    king = find_current_players_king
-    king_moves = check_possible_move_for(king[0],king[1],['inv','inv'])
-    current_pieces = find_all_current_players_pieces
-    opp_pieces = find_all_opposite_players_pieces #[ ["♖", [0, 0]],......]
-    current_paths = []
-    opp_paths     = []
-    attack_paths  = []
-    king_space = spaces_around_king
-    king_cannot_move   = false
-    king_cannot_defend = false
-    king_under_attack  = false
-    illegal = king_future_capture  
+    p opp_team_captures
+    # king = find_current_players_king
+    # king_moves = check_possible_move_for(king[0],king[1],['inv','inv'])
+    # current_pieces = find_all_current_players_pieces
+    # opp_pieces = find_all_opposite_players_pieces #[ ["♖", [0, 0]],......]
+    # current_paths = []
+    # opp_paths     = []
+    # attack_paths  = []
+    # king_space = spaces_around_king
+    # king_cannot_move   = false
+    # king_cannot_defend = false
+    # king_under_attack  = false
+    # illegal = king_future_capture  
     
-    
-    if opp_team_captures.include?(king[1]) 
-      king_under_attack  = true
-      puts "test 1: IS KING BEING ATTACKED? #{king_under_attack}" 
-       #1. CAN KING MOVE AWAY?
-      if king_future_capture != []
-        king_moves.delete_if do |move|
-          illegal.include?(move)
-        end 
-      end   
-      if king_moves.empty?
-        king_cannot_move = true
-        puts "test 2: KING CANNOT MOVE AWAY? #{king_cannot_move}"
-      end 
+    # p king
+    # if opp_team_captures.include?(king[1]) 
+    #   king_under_attack  = true
+    #   puts "test 1: IS KING BEING ATTACKED? #{king_under_attack}" 
+    #    #1. CAN KING MOVE AWAY?
+    #   if king_future_capture != []
+    #     king_moves.delete_if do |move|
+    #       illegal.include?(move)
+    #     end 
+    #   end   
+    #   if king_moves.empty?
+    #     king_cannot_move = true
+    #     puts "test 2: KING CANNOT MOVE AWAY? #{king_cannot_move}"
+    #   end 
 
-      # 2. CAN KING DEFEND?
-      # 2a. FIND attacking pieces AND paths  
-    
-    else
-      king_under_attack  = false
-    end  
+    #   # 2. CAN KING DEFEND?
+
+    #   # 2a. FIND attacking pieces(if piece is attacking king)   
+    #   opp_pieces.each do |piece|
+    #     opp_pieces.delete_if {|piece| piece[0] == "♔" || piece[0] == "♚"}
+    #     if check_possible_move_for(piece[0],piece[1],['inv','inv']).include?(king[1])
+    #       if piece[0] == "♘" || piece[0] == "♞"
+    #         attack_paths << piece[0]
+    #       elsif piece[0] == "♙ " || piece[0] == "♟"
+    #         attack_paths << piece[0]
+    #       else 
+    #         attack_paths << piece[0]            
+    #       end
+    #     end     
+    #   end 
+
+    #   puts "attack_paths #{attack_paths}" 
+    # else
+    #   king_under_attack  = false
+    # end  
 # HERE  - - - - - - - - -   
 # 2a. MAP OF POTENTIAL DEFENING PATHS
-      # current_pieces.each do |item|
-      #   if check_possible_move_for(item[0],item[1],['inv','inv']) != []
-      #     current_paths << check_possible_move_for(item[0],item[1],['inv','inv'])
-      #   end
-      # end  
+#       current_pieces.each do |item|
+#         if check_possible_move_for(item[0],item[1],['inv','inv']) != []
+#           current_paths << check_possible_move_for(item[0],item[1],['inv','inv'])
+#         end
+#       end  
 
-    # # # 3. MAP OF OPPOSING PATHS w/ pieces AND locations!
+#     # # 3. MAP OF OPPOSING PATHS w/ pieces AND locations!
 
-    # opp_pieces.each do |item|
-    #   if check_possible_move_for(item[0],item[1],['inv','inv']) != []
-    #     # if item[0] != "♘" || item[0] != "♞"
-    #     opp_paths << [item, check_possible_move_for(item[0],item[1],['inv','inv'])]
-    #   end
-    # end
+   
     
-    # # # 4. CHECK if opposing paths ATTACK the king
-    # opp_paths.each do |path|
-    #   if path[1].include?(king[1])
-    #     if path[0][0] == "♘" ||  path[0][0] == "♞"
-    #       attack_paths.push(path[0][1])
-    #     elsif  path[0][0] != "♘" ||  path[0][0] != "♞"           
-    #        x = path[1] & king_space
-    #       x.flatten!(1) 
-    #       if x != []
-    #         attack = create_linear_path(king[1],x)
-    #         attack.push(path[0][1])
-    #         attack_paths << attack 
-    #       end 
-    #     end   
-    #   end      
-    # end
-    # attack_paths.flatten!(1)
-    # # p king
-    # puts " attack_paths #{attack_paths}"
-    # # puts "king moves #{king_moves}"
+#     # # 4. CHECK if opposing paths ATTACK the king
+#     opp_paths.each do |path|
+#       if path[1].include?(king[1])
+#         if path[0][0] == "♘" ||  path[0][0] == "♞"
+#           attack_paths.push(path[0][1])
+#         elsif  path[0][0] != "♘" ||  path[0][0] != "♞"           
+#            x = path[1] & king_space
+#           x.flatten!(1) 
+#           if x != []
+#             attack = create_linear_path(king[1],x)
+#             attack.push(path[0][1])
+#             attack_paths << attack 
+#           end 
+#         end   
+#       end      
+#     end
+#     attack_paths.flatten!(1)
+#     # p king
+#     puts " attack_paths #{attack_paths}"
+#     # puts "king moves #{king_moves}"
     
-    # if attack_paths.length > 0
-    #   king_under_attack = true
-    #   puts "test 2: IS KING BEING ATTACKED? #{king_under_attack}" 
-    # end  
+#     if attack_paths.length > 0
+#       king_under_attack = true
+#       puts "test 2: IS KING BEING ATTACKED? #{king_under_attack}" 
+#     end  
     
     # # # 5.CHECK if player can defend against attack(from queens/rooks/bishops)
     # defend_paths = [] 
