@@ -32,7 +32,7 @@ include Ui_messages
         new_game.look_for_check_mate
        end 
        puts " -G-A-M-E-   -O-V-E-R-"
-       puts "#{new_game.turn} LOSES"
+       puts "#{new_game.turn} LOSES "
       
 
 
