@@ -24,11 +24,11 @@ include Ui_messages
  	   new_game_player2
  	    player_two = gets.chomp
        new_game = Chess_game.new(player_one,player_two)
- 	   
  	   while new_game.check_mate == false 
  	   	new_game.look_for_check_mate
         new_game.print_board
         new_game.change_player
+        puts "- -after change players- -"
         new_game.look_for_check_mate
        end 
        puts " -G-A-M-E-   -O-V-E-R-"
