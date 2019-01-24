@@ -1,8 +1,11 @@
-# require_relative('user_interface')
+
+require_relative("save_or_load")
+require_relative("user_interface")
 require "pry"
 
 class Chess_game
-  # include Ui_messages
+   include Game_data_functions
+   include Ui_messages
 	attr_accessor :board, :player_one, :player_two, :turn, :check_mate, :check 
 
 	def initialize(p1,p2)
@@ -20,44 +23,12 @@ class Chess_game
         ['-','-','-','-','-','-','-','-'],
         ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
         ['♜','♞','♝','♚','♛','♝','♞','♜']  #white
-      ] 
-      
-      #   ['-','♔','-','-','-','-','-','-'], #black
-      #   ['-','-','-','-','-','-','-','-'], #black
-      #   ['♝','♚','-','-','-','♞','-','-'],
-      #   ['-','-','-','-','-','-','-','-'],
-      #   ['-','-','-','-','-','-','-','-'],
-      #   ['-','-','-','-','-','-','-','-'],
-      #   ['-','-','-','-','-','-','-','-'], #white
-      #   ['-','-','-','-','-','♘','-','-']  #white
-      # ]
-      #[
-      #   ['-','-','-','♕','♖','♔','-','-'], #black
-      #   ['-','♜','-','-','-','-','♜','♙'], #black
-      #   ['♙','-','-','♖','-','-','-','♝'],
-      #   ['-','-','♙','-','-','-','-','-'],
-      #   ['-','-','-','-','♟','-','-','-'],
-      #   ['-','-','-','-','-','-','♟','-'],
-      #   ['♗','-','-','-','-','-','♚','♟'], #white
-      #   ['-','-','-','-','-','-','-','-']  #white
-      # ]
-      
-
-      # [
-      #   ['♖','♘','♙','♕','♔','♗','♘','♖'], #black
-      #   ['♙','♙','♙','♙','♙','♙','♙','♙'], #black
-      #   ['-','-','-','-','-','-','-','-'],
-      #   ['-','-','-','-','-','-','-','-'],
-      #   ['-','-','-','-','-','-','-','-'],
-      #   ['-','-','-','-','-','-','-','-'],
-      #   ['♟','♟','♟','♟','♟','♟','♟','♟'], #white
-      #   ['♜','♞','♝','♛','♚','♝','♞','♜']  #white
-      # ]
+      ]  
 	end	
 
 	def print_board
     player = ''
-    
+
     if self.turn == "WHITE"
       player = player_one
     elsif self.turn == "BLACK"
@@ -123,7 +94,7 @@ class Chess_game
       puts " S E L E C T    T H E    P I E C E   Y O U   W A N T   T O   M O V E"
       puts "TYPE the ROW (1-8): and press ENTER"
       row = gets.chomp
-      puts 'TYPE the COLUMN (a - h / A - H):  and press ENTER'
+      puts 'TYPE the COLUMN (a - h):  and press ENTER'
       column = gets.chomp
       from = [row,column]
       puts "- - - - -" 
@@ -149,6 +120,9 @@ class Chess_game
           end 
        end 
     end
+    if row == "SAVE"
+      return "SAVE"
+    end  
     puts "SELECTED PIECE #{player_input} -->  #{row},#{column} "
     return from 
   end 
@@ -570,7 +544,7 @@ class Chess_game
     if opp_team_captures.include?(king[1]) 
       king_under_attack  = true
       puts "test 1: IS KING BEING ATTACKED? #{king_under_attack}" 
-      
+
        #1. CAN KING MOVE AWAY?
       if king_future_capture != []
         king_moves.delete_if do |move|

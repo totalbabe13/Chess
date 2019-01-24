@@ -57,8 +57,25 @@ module Ui_messages
     puts "                                        THEN PRESS -->  RETURN KEY "
     15.times { |i| puts " " }
   end
+ 
+  def ask_to_save
+    system("clear")
+    15.times { |i| puts " " }
+    puts "SAVE GAME ???"
+    puts "YES : 1 and press ENTER"
+    puts "NO  : press ENTER"
+    user_response = gets.chomp
+    if user_response == 1.to_s
+     return true
+    else
+     return false
+    end  
+  end
 
-  
-
+  def save_message(game)
+     system("clear")
+    15.times { |i| puts " " }
+    puts "game is saved under player 1 name : #{game.player_one[0]}"
+  end  
 
 end
