@@ -27,10 +27,8 @@ include Game_data_functions
  	    player_one = gets.chomp
  	    new_game_player2
  	    player_two = gets.chomp
-        new_game = Chess_game.new(player_one ,player_two)
+        new_game   = Chess_game.new(player_one ,player_two)
  	    
- 	    
-
  	    while new_game.check_mate == false 
  	      if ask_to_save == true
  	       saved = true
@@ -48,17 +46,15 @@ include Game_data_functions
         if new_game.check_mate == true
           puts " -G-A-M-E-   -O-V-E-R-"
           puts "#{new_game.turn} LOSES "
+          puts "press enter to continue"
+          clear = gets.chomp
         end
 
         puts "testing directory"
-        game_name   = save_message #title--> (game.json)
-        game_string = new_game.to_json  #JSON --> hash object...
+        game_name   = save_message 
+        game_string = new_game.to_json  
         saved_game  = create_game_file(game_string,game_name)        
-        # save_game_in_folder(saved_game)  	
-      
-
-
-
+       	
  	elsif user_response_2 == '2'
  	 puts "test - Load old game path"
  	 load_game = load_game_file(load_message)
