@@ -61,7 +61,18 @@ include Game_data_functions
 
  	elsif user_response_2 == '2'
  	 puts "test - Load old game path"
- 	 load_game_file(load_message)
+ 	 load_game = load_game_file(load_message)
+ 	 while load_game.check_mate == false 
+ 	      if ask_to_save == true
+ 	       saved = true
+ 	      end 	
+ 	   	  break if saved
+ 	   	  load_game.look_for_check_mate
+          load_game.print_board
+          load_game.change_player
+          puts "- -after change players- -"
+          load_game.look_for_check_mate
+        end 
  	else 
  	 puts " INVALID ENTRY"	
  	end	

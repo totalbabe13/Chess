@@ -1,4 +1,5 @@
 require 'json'
+require_relative 'chess_objects'
 
 module Game_data_functions	
 
@@ -7,7 +8,6 @@ module Game_data_functions
     	:board => @board,
     	:player_one => @player_one,
     	:player_two => @player_two,
-    	:check => @check, 
     	:check_mate => @check_mate,
     	:turn => @turn
       }
@@ -26,8 +26,8 @@ module Game_data_functions
     	if File.exists?(game_name)
     		puts "test works!"
     		json =  File.read(game_name)
-    		obj  = JSON.parse(json)
-    		pp obj
+    		game  = JSON.parse(json)
+    		Chess_game.new(game["player_one"],game["player_two"], game['turn'],game['check_mate'] ,game['board'])
     	end	
     end	
 
