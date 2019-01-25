@@ -72,10 +72,20 @@ module Ui_messages
     end  
   end
 
-  def save_message(game)
-     system("clear")
+  def save_message
+    system("clear")
     15.times { |i| puts " " }
-    puts "game is saved under player 1 name : #{game.player_one[0]}"
+    puts "Type in a name to save you game under:}"
+    saved_game = gets.chomp
+    "saved_games/#{saved_game}.json"
+  end
+
+  def load_message
+    system("clear")
+    15.times { |i| puts " " }
+    puts "Type in the name you saved your game under:}"
+    load_game = gets.chomp
+    "saved_games/#{load_game}.json"
   end  
 
 end

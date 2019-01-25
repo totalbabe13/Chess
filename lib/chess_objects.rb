@@ -12,7 +12,6 @@ class Chess_game
 	    @player_one = [p1,[],false] #white
       @player_two = [p2,[],false] #black
       @turn       = "WHITE" # "BLACK" or "WHITE"
-      @check = false
       @check_mate = false
       @board = [
         ['♖','♘','♗','♔','♕','♗','♘','♖'], #black

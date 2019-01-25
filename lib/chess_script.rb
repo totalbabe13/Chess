@@ -1,9 +1,11 @@
 require_relative('chess_objects')
 require_relative('user_interface')
+require_relative('save_or_load')
 require "pry"
 
 
 include Ui_messages
+include Game_data_functions
 
  welcome_message #UI message CHESS /PRESS ENTER
  user_response_1 = gets.chomp
@@ -27,7 +29,7 @@ include Ui_messages
  	    player_two = gets.chomp
         new_game = Chess_game.new(player_one ,player_two)
  	    
- 	    new_game.to_json
+ 	    
 
  	    while new_game.check_mate == false 
  	      if ask_to_save == true
@@ -48,15 +50,18 @@ include Ui_messages
           puts "#{new_game.turn} LOSES "
         end
 
-        save_message(new_game)
-        
-        	
+        puts "testing directory"
+        game_name   = save_message #title--> (game.json)
+        game_string = new_game.to_json  #JSON --> hash object...
+        saved_game  = create_game_file(game_string,game_name)        
+        # save_game_in_folder(saved_game)  	
       
 
 
 
  	elsif user_response_2 == '2'
  	 puts "test - Load old game path"
+ 	 load_game_file(load_message)
  	else 
  	 puts " INVALID ENTRY"	
  	end	
