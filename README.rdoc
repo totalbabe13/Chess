@@ -3,15 +3,15 @@ This was an assignment from the odin project:
 ( https://www.theodinproject.com/courses/ruby-programming/lessons/ruby-final-project )
 
 the goal of this project was to make a two player chess game two people could play on the terminal.
-The direction from odin, specidied that the program should know whether a player's move is legal or not.
+The directions from Odin, specified that the program should know whether a player's move is legal or not.
 The game should be SAVE-able and LOAD-able.
 
-Baisically, the direction were VERY open-ended. I succeeded for the majority of this program to allow the program to recognize
+Baisically, the directions were VERY open-ended. I succeeded for the majority of this program to allow the program to recognize
 when a player is in check, or check-mate. The game does not let you move pieces out of thier scope of movement. I will say: 
 I did NOT, code 'castleing' or 'ean-passant', I realized I was rabbit-holing. The game can be saved as a JSON object.
 You can load it back up at any moment.
 
-In hindsight: I wish i had started writing RSPEC tests sooner. there were many moments where I had to test things OVER and over.
+In hindsight: I wish I had started writing RSPEC tests sooner. there were many moments where I had to test things OVER and over.
 I also would have designed the program to be more object oriented. I underestimated the complexity of all the methods 
 and functions the game has. I would have kept my classes less rigid, and more organized.
 
