@@ -28,7 +28,7 @@ include Game_data_functions
  	    new_game_player2
  	    player_two = gets.chomp
         new_game   = Chess_game.new(player_one ,player_two)
- 	    p new_game
+ 	    
  	    while new_game.check_mate == false 
  	      if ask_to_save == true
  	        saved = true
